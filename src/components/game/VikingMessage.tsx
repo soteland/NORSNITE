@@ -1,10 +1,10 @@
 import { useRef } from 'react'
-import viking01 from '@/images/viking-01.png'
-import viking02 from '@/images/viking-02.png'
-import viking03 from '@/images/viking-03.png'
-import viking04 from '@/images/viking-04.png'
-import viking05 from '@/images/viking-05.png'
-import viking06 from '@/images/viking-06.png'
+import viking01 from '/images/viking-01.png'
+import viking02 from '/images/viking-02.png'
+import viking03 from '/images/viking-03.png'
+import viking04 from '/images/viking-04.png'
+import viking05 from '/images/viking-05.png'
+import viking06 from '/images/viking-06.png'
 
 const VIKINGS = [viking01, viking02, viking03, viking04, viking05, viking06]
 

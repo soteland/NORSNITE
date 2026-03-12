@@ -13,7 +13,7 @@ import GameMenu from '@/components/layout/GameMenu'
 import type { Database } from '@/lib/supabase/client'
 import type { Question } from '@/content/types'
 
-import norsniteLogo from '@/images/norsnite-logo.png'
+import norsniteLogo from '/images/norsnite-logo.png'
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row']
 type Phase = 'loading' | 'playing' | 'loot' | 'result' | 'error'

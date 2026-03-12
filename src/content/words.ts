@@ -80,7 +80,7 @@ export const words: Word[] = [
   { id: 'kro-010', word: 'kne',         emoji: '🦵', category: 'kropp', difficulty: 3  },
   { id: 'kro-011', word: 'albue',       emoji: '💪', category: 'kropp', difficulty: 4  },
   { id: 'kro-012', word: 'ankel',       emoji: '🦶', category: 'kropp', difficulty: 4  },
-  { id: 'kro-013', word: 'taco',       emoji: '🌭', category: 'kropp', difficulty: 4  },
+  { id: 'kro-013', word: 'hot dog',       emoji: '🌭', category: 'kropp', difficulty: 4  },
   { id: 'kro-014', word: 'pølse i brød',   emoji: '🌭', category: 'kropp', difficulty: 5  },
   { id: 'kro-015', word: 'håndflate',    emoji: '✋', category: 'kropp', difficulty: 6  },
   { id: 'kro-016', word: 'kjøttstykke',   emoji: '🥩', category: 'kropp', difficulty: 7  },
