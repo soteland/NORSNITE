@@ -4,7 +4,7 @@ Et Fortnite-inspirert norsk lesespill for barn 7–12 år. Målet er at barn ska
 
 *Hva gjør en pappa som kan kode, men som ikke er så flink lærer? Dette!*
 
-> **Språk: Kun norsk.** Spillet er bygget for norsktalende barn og skal aldri oversettes. All UI-tekst, instruksjoner, spørsmål og tilbakemeldinger er på norsk. Ingen i18n, ingen lokaliseringslag.
+> **Språk: Kun norsk.** Spillet er bygget for norsktalende barn og jeg har ingen umiddelbare planer om å oversette det. All UI-tekst, instruksjoner, spørsmål og tilbakemeldinger er på norsk. Ingen i18n, ingen lokaliseringslag.
 
 ---
 
@@ -12,7 +12,7 @@ Et Fortnite-inspirert norsk lesespill for barn 7–12 år. Målet er at barn ska
 
 - **Norsk lesetrening** — ikke fremmedspråklæring, men flyt og forståelse for morsmålsbrukere
 - **Web app** som fungerer bra i Safari på iPad og iPhone
-- **Innlogging** via Google (gmail.com) eller Microsoft (outlook.com) — ingen passord å huske
+- **TBD: Innlogging** via Google (gmail.com) eller Microsoft (outlook.com) — ingen passord å huske
 - **Venner-system** — se dine venners liga-nivå og XP
 - **Solo spill-loop** — fullfør runder med minispill, tjen XP, klatre i ligaer, lås opp kosmetikk
 

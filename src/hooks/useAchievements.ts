@@ -37,13 +37,6 @@ export function useAchievements(userId: string | undefined) {
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
 
-    const { count: perfectRounds } = await supabase
-      .from('xp_log')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('crown_win', false) // we need "perfect" = questions_correct == questions_total
-    // Actually, perfect means correct == total. Let's fetch the last few to count consecutive.
-
     // Get recent rounds to count perfect rounds and consecutive perfect streak
     const { data: recentLogs } = await supabase
       .from('xp_log')

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from '@tanstack/react-router'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/auth/AuthContext'
 import { getLeague } from '@/lib/xp'
@@ -26,6 +27,7 @@ type FriendEntry = {
 
 export default function FriendsPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [friends, setFriends] = useState<FriendEntry[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResult, setSearchResult] = useState<Profile | null | 'not_found' | 'self' | 'already'>(null)
@@ -33,6 +35,7 @@ export default function FriendsPage() {
   const [sending, setSending] = useState(false)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<number | null>(null)
+  const [confirmRemoveId, setConfirmRemoveId] = useState<number | null>(null)
 
   useEffect(() => {
     if (user) loadFriends()
@@ -255,22 +258,44 @@ export default function FriendsPage() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.04 }}
-                    className="flex items-center justify-between bg-white/5 border border-white/10
-                               rounded-2xl px-4 py-3"
+                    className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{LEAGUE_EMOJI[getLeague(f.profile.total_xp)]}</span>
-                      <div>
-                        <p className="text-white font-bold">{f.profile.username}</p>
-                        <p className="text-[var(--muted)] text-sm">{f.profile.total_xp} XP · {getLeague(f.profile.total_xp)}</p>
-                      </div>
+                    {/* Main row */}
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <button
+                        onClick={() => navigate({ to: '/venner/$userId', params: { userId: f.profile.id } })}
+                        className="flex items-center gap-3 flex-1 text-left"
+                      >
+                        <span className="text-2xl">{LEAGUE_EMOJI[getLeague(f.profile.total_xp)]}</span>
+                        <div>
+                          <p className="text-white font-bold">{f.profile.username}</p>
+                          <p className="text-[var(--muted)] text-sm">{f.profile.total_xp} XP · {getLeague(f.profile.total_xp)}</p>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => setConfirmRemoveId(confirmRemoveId === f.friendshipId ? null : f.friendshipId)}
+                        className="text-[var(--muted)] hover:text-red-400 transition-colors text-xs px-2 py-1"
+                        title="Fjern venn"
+                      >✕</button>
                     </div>
-                    <button
-                      onClick={() => declineRequest(f.friendshipId)}
-                      disabled={actionLoading === f.friendshipId}
-                      className="text-[var(--muted)] hover:text-red-400 transition-colors text-xs px-2 py-1"
-                      title="Fjern venn"
-                    >✕</button>
+
+                    {/* Confirm remove */}
+                    {confirmRemoveId === f.friendshipId && (
+                      <div className="flex items-center justify-between px-4 py-2 bg-red-900/20 border-t border-red-500/20">
+                        <p className="text-red-300 text-sm font-bold">Fjerne {f.profile.username}?</p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setConfirmRemoveId(null)}
+                            className="px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition"
+                          >Avbryt</button>
+                          <button
+                            onClick={() => { setConfirmRemoveId(null); declineRequest(f.friendshipId) }}
+                            disabled={actionLoading === f.friendshipId}
+                            className="px-3 py-1.5 rounded-xl bg-red-700 text-white text-xs font-bold hover:bg-red-600 transition disabled:opacity-40"
+                          >Ja, fjern</button>
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 ))}
             </div>

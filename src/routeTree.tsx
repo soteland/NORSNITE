@@ -11,6 +11,7 @@ import HomePage from '@/pages/HomePage'
 import GamePage from '@/pages/game/GamePage'
 import ProfilePage from '@/pages/ProfilePage'
 import FriendsPage from '@/pages/FriendsPage'
+import FriendProfilePage from '@/pages/FriendProfilePage'
 import AdminPage from '@/pages/AdminPage'
 import PersonvernPage from '@/pages/PersonvernPage'
 import LeaguesPage from '@/pages/LeaguesPage'
@@ -99,6 +100,13 @@ const friendsRoute = createRoute({
   component: FriendsPage,
 })
 
+const friendProfileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/venner/$userId',
+  beforeLoad: requireAuth,
+  component: FriendProfilePage,
+})
+
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin',
@@ -132,6 +140,7 @@ export const routeTree = rootRoute.addChildren([
   gameRoute,
   profileRoute,
   friendsRoute,
+  friendProfileRoute,
   adminRoute,
   leaguesRoute,
   devRoute,

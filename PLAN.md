@@ -213,18 +213,18 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
 
 ## Implementation Phases
 
-### Phase 1 — Project Foundation
+### Phase 1 — Project Foundation ✅ DONE (except noted)
 - [x] Fix PLAN.md stale references (done in review pass)
-- [ ] Scaffold Vite + React + TypeScript in `/norsGame/`
-- [ ] Create `.env.local` from `.env.example` (already exists) — fill in dev Supabase URL + anon key + admin UUID
-- [ ] Install all deps: TanStack Router, TanStack Query, Zustand, RHF+Zod, Framer Motion, shadcn/ui, Tailwind, @dicebear/collection, supabase-js
-- [ ] Set up **two** Supabase projects: `norsnite-dev` and `norsnite-prod` — migrations from day 1
-- [ ] Create `supabase/migrations/` folder with initial schema (profiles, xp_log, friends, unlocks, earned_achievements)
-- [ ] Add GitHub Actions keep-alive workflow (`.github/workflows/keep-alive.yml`) — weekly ping to dev + prod Supabase to prevent 7-day free-tier pause
+- [x] Scaffold Vite + React + TypeScript in `/norsGame/`
+- [x] Create `.env.local` from `.env.example` — filled in dev Supabase URL + anon key + admin UUID
+- [x] Install all deps: TanStack Router, Zustand, Framer Motion, shadcn/ui, Tailwind, @dicebear/collection, supabase-js
+- [x] Supabase migrations folder with initial schema (`supabase/migrations/001_initial.sql`, `002_friends_achievements_select.sql`)
+- [x] GitHub Actions keep-alive workflow (`.github/workflows/keep-alive.yml`)
+- [x] GitHub Actions deploy to GitHub Pages (`.github/workflows/deploy-pages.yml`)
 - [ ] Wire Google + Microsoft OAuth via Supabase Auth — **ON ICE**
-- [ ] Session handling and protected routes (TanStack Router guards)
-- [ ] Cloudflare Pages config (`wrangler.toml`)
-- [ ] Environment variables pattern (`.env.local` for dev, Cloudflare secrets for prod)
+- [x] Session handling and protected routes (TanStack Router guards in routeTree.tsx)
+- [ ] Cloudflare Pages config (`wrangler.toml`) — currently deployed on GitHub Pages; migrate when ready
+- [x] Environment variables pattern (`.env.local` for dev, GitHub Secrets for CI)
 
 ### Phase 2 — Content Layer ✅ DONE
 - [x] Design content TypeScript types: `Word`, `FillSentence`, `OrderSentence`, `ComprehensionText`, `PunctuationQuestion`
@@ -235,32 +235,30 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
 - [x] 44 punctuation questions (D1–D10, with teachingNote per question)
 - [x] Norwegian word lists for username generation (`src/lib/username/adjectives.ts`, `nouns.ts`, `index.ts`)
 
-### Phase 3 — Core Game Loop
-- [ ] Round controller: select N questions based on league tier (5–10), draw from all unlocked minigame types
-- [ ] Crown win logic: **10%** random roll at round start; stored in Zustand for the round. Crown Win requires **all answers correct** (perfect round) — gives +50% XP bonus. No crown = no bonus. Non-perfect crown round = normal loss, zero penalty.
-- [ ] XP award logic: bonuses are **multiplicative** — `xp = base × (1.25 if perfect) × (1.50 if crown_win) × (1.25 if comeback)`. Client computes XP, server stores it (accepted for non-competitive game). After each round: increment `today_xp` (reset if `today_date` < today), update `max_xp_in_day` if today's total is a new record, check daily-record achievements.
-- [ ] Wrong answer flow: red flash 1s → show correct answer 2s → speak correct answer (Web Speech) → re-queue question at end of round. `questions_total` = **original round length only** (re-queued retries are not counted).
-- [ ] `rounds_since_loot` increment + loot box trigger: after round 1 for new players, every 5 rounds thereafter. Reset via `claim_loot()` RPC.
-- [ ] Streak logic (in `award_xp` RPC — runs on round completion): `days_missed = (today - last_active_date) - 1`. If `days_missed > 0` AND `streak_days >= 3` AND `streak_shield_days >= days_missed` → consume exactly `days_missed` shield days, streak +1. Otherwise reset streak to 1. Always set `last_active_date = today`.
-- [ ] "Nesten der!"-hook on Victory Royale screen: always show XP to next league/badge milestone, pulse if within 20% of threshold. Big "Spill igjen?" CTA.
-- [ ] Victory Royale / Winner feedback screen with Framer Motion animation
-- [ ] League tier calculation from `total_xp`
-- [ ] ~~Adaptive difficulty from xp_log~~ **REMOVED**. Difficulty changes only via: (1) self-report 😴/😊/😤, (2) league floor bump on promotion.
-- [ ] Difficulty self-report: at round end, if total_correct_answers just crossed a multiple of 15 → show viking asking 😴/😊/😤 (max once per round). ±1 difficulty, never below league floor.
-- [ ] Offline detection: if Supabase drops mid-round → show error, void round, no XP
+### Phase 3 — Core Game Loop ✅ DONE (except noted)
+- [x] Round controller: select N questions based on league tier (5–10), draw from all unlocked minigame types
+- [x] Crown win logic: 10% random roll at round start; stored in Zustand. Crown Win = perfect round → +50% XP.
+- [x] XP award logic: multiplicative bonuses, `award_xp` RPC, `today_xp`/`max_xp_in_day` tracking
+- [x] Skip token (hjelpemiddel): confirmation sheet before use; voids perfect/crown win eligibility. Max 5 banked.
+- [x] Wrong answer flow: red flash → show correct answer → re-queue question. `questions_total` = original round length only.
+- [x] `rounds_since_loot` increment + loot box trigger. `claim_loot()` RPC.
+- [x] Streak logic in `award_xp` RPC (shield days, reset, etc.)
+- [x] Victory Royale / round result screen with Framer Motion
+- [x] League tier calculation from `total_xp`
+- [x] ~~Adaptive difficulty~~ **REMOVED**
+- [x] Difficulty self-report: 😴/😊/😤 viking prompt every 15 correct answers (max once per round)
+- [x] Comeback bonus: +25% XP, full-screen Framer Motion splash, Zustand only, voided on reload
+- [ ] "Nesten der!"-hook on Victory Royale screen: show XP to next league/badge milestone, pulse if within 20%. **NOT YET DONE.**
+- [ ] Offline detection: if Supabase drops mid-round → show error, void round, no XP. **NOT YET DONE.**
 
-### Phase 4 — Minigames
-- [ ] Minigame 1: **Ord→Bilde** (read word, choose correct emoji from 3) — available from Bronze
-- [ ] Minigame 2: **Bilde→Ord** (see emoji, choose correct word from 3) — available from Bronze
-- [ ] Minigame 3: **Fyll inn** (complete the sentence, choose from 3 words) — unlocks at Silver
-- [ ] Minigame 4: **Skriv ordet** (hear/see word, type it yourself) — unlocks at Gold
-  - ÆØÅ custom on-screen buttons for all devices
-  - `visualViewport` API for iOS keyboard handling (viewport shrinks when keyboard opens)
-- [ ] Minigame 5: **Ordrekkefølge** (build sentence from shuffled word tiles) — unlocks at Platinum
-- [ ] Minigame 6: **Les og forstå** (read paragraph → pick 1 of 3: «Hva handlet dette om?») — unlocks at Diamond
-- [ ] Minigame 7: **Sett tegnet** (choose correct punctuation . ? ! for a sentence) — unlocks at Silver
-  - Always 3 choices (. ? !)
-  - Show `teachingNote` after each answer (correct or wrong) — teaches the rule
+### Phase 4 — Minigames ✅ DONE
+- [x] Minigame 1: **Ord→Bilde** — available from Bronze
+- [x] Minigame 2: **Bilde→Ord** — available from Bronze
+- [x] Minigame 3: **Fyll inn** — unlocks at Silver
+- [x] Minigame 4: **Skriv ordet** — ÆØÅ on-screen buttons, iOS keyboard handling via visualViewport
+- [x] Minigame 5: **Ordrekkefølge** — word tiles, 88 sentences (wo-001 to wo-088)
+- [x] Minigame 6: **Les og forstå** — 12 comprehension paragraphs
+- [x] Minigame 7: **Sett tegnet** — 3 choices (. ? !), `teachingNote` after each answer
 
 ### Phase 5 — Profile & Progression
 - [x] Profile page: avatar editor, XP bar, league badge, streak, crown count, badges
@@ -272,10 +270,12 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
 - [x] Achievement badges: 19 milestone + 9 daily XP + 8 league badges. CSS radial-gradient circles with neon glow. Auto-checked after each round, displayed on profile and round result screen. Earned achievements stored in `earned_achievements` table.
 
 ### Phase 6 — Friends
-- [ ] Add friend by exact username search
-- [ ] Friend request + approval flow (pending → accepted; can block)
-- [ ] Friends list with league badge and XP rank
-- [ ] Friendship linked to UUID — username changes transparent to friends
+- [x] Add friend by exact username search
+- [x] Friend request + approval flow (pending → accepted; can block)
+- [x] Friends list with league badge and XP rank
+- [x] Friendship linked to UUID — username changes transparent to friends
+- [x] Confirm before removing a friend (inline confirmation row)
+- [x] Friend profile page `/venner/:userId` — read-only: avatar, league bar, streak, crown wins, badges. Gated: only accessible if actually friends. RLS migration 002 allows friends to read each other's earned_achievements.
 
 ### Phase 7 — Admin & Season
 - [ ] Admin page (gated by `ADMIN_USER_ID` env var):
@@ -292,6 +292,7 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
 - [ ] Supabase production project: enable RLS on all tables, verify Edge Functions
 - [ ] Test Google + Microsoft OAuth with real accounts (incl. school Microsoft tenant)
 - [ ] Smoke test on real iPhone + iPad in Safari
+- [ ] **Potensiell forbedring — SPA deep links på GitHub Pages**: Nåværende `404.html` redirecter alltid til `/`, så direkte URL-er fungerer men brukeren mister ønsket side. Løsning: lagre `location.pathname + location.search` i `sessionStorage` i `404.html` før redirect, og gjenopprett med `history.replaceState` i `index.html` etter SPA laster. Ikke prioritert — barn deler sjelden dype lenker.
 
 ---
 

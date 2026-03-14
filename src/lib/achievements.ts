@@ -80,10 +80,6 @@ export const DAILY_XP_ACHIEVEMENTS: Achievement[] = [
 
 // ── League badges ───────────────────────────────────────────────────────────
 
-const LEAGUE_EMOJI: Record<League, string> = {
-  Bronze: '🥉', Silver: '🥈', Gold: '🥇', Platinum: '💜',
-  Diamond: '💙', Elite: '🔥', Champion: '👑', Unreal: '⚡',
-}
 
 export const LEAGUE_ACHIEVEMENTS: Achievement[] = [
   { key: 'league_bronze',   emoji: '🥉', name: 'Bronse',    description: 'Nå Bronze league',   rarity: 'common' },
