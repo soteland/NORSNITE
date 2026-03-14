@@ -5,7 +5,7 @@ interface TurnstileWidgetProps {
   onExpire?: () => void
 }
 
-const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string
+const SITE_KEY: string | undefined = import.meta.env.VITE_TURNSTILE_SITE_KEY
 
 declare global {
   interface Window {
@@ -20,7 +20,13 @@ export function TurnstileWidget({ onSuccess, onExpire }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
 
+  // No site key configured — bypass silently (e.g. local dev)
   useEffect(() => {
+    if (!SITE_KEY) { onSuccess('no-sitekey-bypass'); return }
+  }, [])
+
+  useEffect(() => {
+    if (!SITE_KEY) return
     // Load Turnstile script if not already loaded
     if (!document.getElementById('cf-turnstile-script')) {
       const script = document.createElement('script')
@@ -55,6 +61,8 @@ export function TurnstileWidget({ onSuccess, onExpire }: TurnstileWidgetProps) {
       widgetIdRef.current = null
     }
   }, [onSuccess, onExpire])
+
+  if (!SITE_KEY) return null
 
   return <div ref={containerRef} className="flex justify-center" />
 }
