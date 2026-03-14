@@ -384,7 +384,10 @@ export default function ProfilePage() {
               onClick={async () => {
                 setDeleting(true)
                 setDeleteError(null)
-                const { error } = await supabase.functions.invoke('delete-account')
+                const { data: { session } } = await supabase.auth.getSession()
+                const { error } = await supabase.functions.invoke('delete-account', {
+                  headers: { Authorization: `Bearer ${session?.access_token}` },
+                })
                 if (error) {
                   setDeleteError('Noe gikk galt. Prøv igjen.')
                   setDeleting(false)
