@@ -12,6 +12,8 @@ import {
   buildWordToImage,
   buildImageToWord,
   buildSpellIt,
+  getSynonymForDifficulty,
+  getAntonymForDifficulty,
 } from '@/content'
 import type { Question, QuestionType } from '@/content/types'
 import QuestionCard from '@/components/game/QuestionCard'
@@ -31,6 +33,8 @@ const TYPES: { type: QuestionType; label: string }[] = [
   { type: 'word_order',    label: 'Ordrekkefølge' },
   { type: 'comprehension', label: 'Les og forstå' },
   { type: 'spell_it',      label: 'Skriv ordet' },
+  { type: 'synonym',       label: 'Synonym' },
+  { type: 'antonym',       label: 'Motsetning' },
 ]
 
 function buildQuestion(type: QuestionType, difficulty: number): Question | null {
@@ -60,6 +64,16 @@ function buildQuestion(type: QuestionType, difficulty: number): Question | null 
     if (!pool.length) return null
     const word = pool[Math.floor(Math.random() * pool.length)]
     return type === 'word_to_image' ? buildWordToImage(word, difficulty) : buildImageToWord(word, difficulty)
+  }
+  if (type === 'synonym') {
+    const pool = getSynonymForDifficulty(difficulty)
+    if (!pool.length) return null
+    return pool[Math.floor(Math.random() * pool.length)]
+  }
+  if (type === 'antonym') {
+    const pool = getAntonymForDifficulty(difficulty)
+    if (!pool.length) return null
+    return pool[Math.floor(Math.random() * pool.length)]
   }
   // spell_it — use dedicated spell pool, fall back to regular words
   const spellPool = getSpellWordsForDifficulty(difficulty)

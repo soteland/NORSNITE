@@ -249,7 +249,7 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
 - [x] Difficulty self-report: 😴/😊/😤 viking prompt every 15 correct answers (max once per round)
 - [x] Comeback bonus: +25% XP, full-screen Framer Motion splash, Zustand only, voided on reload
 - [ ] "Nesten der!"-hook on Victory Royale screen: show XP to next league/badge milestone, pulse if within 20%. **NOT YET DONE.**
-- [ ] Offline detection: if Supabase drops mid-round → show error, void round, no XP. **NOT YET DONE.**
+- ~~Offline detection~~ **REMOVED** — edge case for home WiFi / parent phones; lost XP on disconnect is acceptable.
 
 ### Phase 4 — Minigames ✅ DONE
 - [x] Minigame 1: **Ord→Bilde** — available from Bronze
@@ -259,6 +259,8 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
 - [x] Minigame 5: **Ordrekkefølge** — word tiles, 88 sentences (wo-001 to wo-088)
 - [x] Minigame 6: **Les og forstå** — 12 comprehension paragraphs
 - [x] Minigame 7: **Sett tegnet** — 3 choices (. ? !), `teachingNote` after each answer
+- [x] Minigame 8: **Synonym** — show a word, pick the word with the same meaning. 30 questions D1–D7. Unlocks at Gold.
+- [x] Minigame 9: **Motsetning** — show a word, pick the word with the opposite meaning. 30 questions D1–D7. Unlocks at Silver.
 
 ### Phase 5 — Profile & Progression
 - [x] Profile page: avatar editor, XP bar, league badge, streak, crown count, badges
@@ -266,6 +268,11 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
 - [ ] Unlockable cosmetics: CSS layer around avatar card — league backgrounds, Champion+ frame, crown icon on Crown Win
 - [x] Crown Win icon display: shown on profile until end of current session (not 24h — it's a per-win highlight; permanent badge earned after first Crown Win)
 - [x] Loot box animation: 3-click (shake, shake, explode). Framer Motion. Duplicates → XP.
+  - **Én belønning per kiste** — belønning rulles ved 3. trykk (chest-open):
+    - Vanlig: fast +25 XP
+    - Sjelden: 80% +50 XP · 10% hopp-token · 10% 1-dagers skjold
+    - Episk: 60% XP(80–160) · 15% hopp-token · 20% 1-dagers skjold · 5% 2-dagers skjold
+    - Legendarisk: 50% XP(160–240) · 20% hopp-token · 18% 1d skjold · 6% 2d · 4% 3d · 2% 5d
 - [x] Comeback-bonus splash: full-screen Framer Motion, +25% XP, Zustand only, voided on reload
 - [x] Achievement badges: 19 milestone + 9 daily XP + 8 league badges. CSS radial-gradient circles with neon glow. Auto-checked after each round, displayed on profile and round result screen. Earned achievements stored in `earned_achievements` table.
 
@@ -282,7 +289,7 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
   - User list: username, XP, league, last active, is_banned toggle
   - Season reset: set end date, trigger reset (archives current league as «Season X» badge), no email shown
   - Season countdown shown subtly to all players
-- [ ] Delete account: Edge Function with service-role key (never in frontend)
+- [x] Delete account: Edge Function (`supabase/functions/delete-account/index.ts`) with service-role key. Frontend: nedgravd knapp på profil → bekreftelsessheet → bruker må skrive brukernavnet eksakt → kaller Edge Function → sletter fra auth.users (cascader til profiles).
 
 ### Phase 8 — Polish & Deploy
 - [ ] Mobile-first CSS polish (iPad/iPhone Safari — large tap targets, readable font for 7-year-olds)

@@ -7,8 +7,8 @@ const LEAGUE_ORDER: League[] = [...LEAGUES] // Bronze → Unreal
 /** Minigame types unlocked at each league tier */
 const UNLOCK_AT: Partial<Record<League, QuestionType[]>> = {
   Bronze:   ['word_to_image', 'image_to_word'],
-  Silver:   ['fill_in', 'punctuation'],
-  Gold:     ['spell_it'],
+  Silver:   ['fill_in', 'punctuation', 'antonym'],
+  Gold:     ['spell_it', 'synonym'],
   Platinum: ['word_order'],
   Diamond:  ['comprehension'],
 }
@@ -57,5 +57,7 @@ export function getCorrectAnswerText(q: Question): string {
     case 'word_order':     return q.correct.join(' ')
     case 'comprehension':  return q.correct
     case 'spell_it':       return q.word.word
+    case 'synonym':        return q.correct
+    case 'antonym':        return q.correct
   }
 }

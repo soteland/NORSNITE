@@ -4,6 +4,8 @@ import { sentences } from './sentences'
 import { wordOrderQuestions } from './wordOrder'
 import { comprehensionQuestions } from './comprehension'
 import { punctuationQuestions } from './punctuation'
+import { synonymQuestions, getSynonymForDifficulty } from './synonyms'
+import { antonymQuestions, getAntonymForDifficulty } from './antonyms'
 import type {
   Question,
   Word,
@@ -14,6 +16,8 @@ import type {
   ComprehensionQuestion,
   SpellItQuestion,
   PunctuationQuestion,
+  SynonymQuestion,
+  AntonymQuestion,
   QuestionType,
 } from './types'
 
@@ -26,6 +30,8 @@ export type {
   ComprehensionQuestion,
   SpellItQuestion,
   PunctuationQuestion,
+  SynonymQuestion,
+  AntonymQuestion,
 }
 export { words, getWordsByCategory, getWordsForDifficulty }
 export { spellWords, getSpellWordsForDifficulty }
@@ -33,6 +39,8 @@ export { sentences }
 export { wordOrderQuestions }
 export { comprehensionQuestions }
 export { punctuationQuestions }
+export { synonymQuestions, getSynonymForDifficulty }
+export { antonymQuestions, getAntonymForDifficulty }
 
 // Fisher-Yates shuffle
 export function shuffleArray<T>(arr: T[]): T[] {
@@ -107,6 +115,14 @@ export function getPunctuationForDifficulty(difficulty: number): PunctuationQues
   return punctuationQuestions.filter(q => Math.abs(q.difficulty - difficulty) <= 1)
 }
 
+export function getSynonymsForDifficulty(difficulty: number): SynonymQuestion[] {
+  return getSynonymForDifficulty(difficulty)
+}
+
+export function getAntonymsForDifficulty(difficulty: number): AntonymQuestion[] {
+  return getAntonymForDifficulty(difficulty)
+}
+
 // Pick a random question of any type for a given difficulty level.
 // excludeIds prevents repeating questions in the same round.
 export function pickRandomQuestion(
@@ -121,6 +137,8 @@ export function pickRandomQuestion(
     'word_order',
     'spell_it',
     'punctuation',
+    'synonym',
+    'antonym',
     // comprehension kept for longer sessions; add to preferredTypes if needed
   ]
   const type = types[Math.floor(Math.random() * types.length)]
@@ -166,6 +184,18 @@ export function pickRandomQuestion(
     const pool = spellPool.length ? spellPool : fallbackPool
     if (!pool.length) return null
     return buildSpellIt(pool[Math.floor(Math.random() * pool.length)], difficulty)
+  }
+
+  if (type === 'synonym') {
+    const pool = getSynonymForDifficulty(difficulty).filter(q => !excludeIds.includes(q.id))
+    if (!pool.length) return null
+    return pool[Math.floor(Math.random() * pool.length)]
+  }
+
+  if (type === 'antonym') {
+    const pool = getAntonymForDifficulty(difficulty).filter(q => !excludeIds.includes(q.id))
+    if (!pool.length) return null
+    return pool[Math.floor(Math.random() * pool.length)]
   }
 
   return null

@@ -74,6 +74,12 @@ export default function ProfilePage() {
   const [checkingUsername, setCheckingUsername] = useState(false)
   const [savingUsername, setSavingUsername] = useState(false)
 
+  // Delete account
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
   useEffect(() => {
     if (!user) return
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle()
@@ -297,20 +303,20 @@ export default function ProfilePage() {
         {/* ── Achievements ── */}
         {!achievementsLoading && (
           <div className="rounded-3xl bg-white/5 border border-white/10 p-4 space-y-4">
-            <h2 className="text-sm uppercase tracking-widest text-[var(--muted)]">Merker</h2>
+            <h2 className="text-lg uppercase tracking-widest text-[var(--muted)] text-center">Merker / Badges</h2>
 
             <div className="space-y-3">
-              <p className="text-xs text-[var(--muted)] font-bold">Milepæler</p>
+              <p className="text-md text-[var(--muted)] font-bold text-center">Milepæler</p>
               <AchievementGrid achievements={ACHIEVEMENTS} earnedKeys={earnedKeys} />
             </div>
 
             <div className="space-y-3">
-              <p className="text-xs text-[var(--muted)] font-bold">Daglig XP-rekord</p>
+              <p className="text-md text-[var(--muted)] font-bold text-center">Daglig XP-rekord</p>
               <AchievementGrid achievements={DAILY_XP_ACHIEVEMENTS} earnedKeys={earnedKeys} />
             </div>
 
             <div className="space-y-3">
-              <p className="text-xs text-[var(--muted)] font-bold">Ligaer</p>
+              <p className="text-md text-[var(--muted)] font-bold text-center">Ligaer</p>
               <AchievementGrid achievements={LEAGUE_ACHIEVEMENTS} earnedKeys={earnedKeys} />
             </div>
           </div>
@@ -318,7 +324,7 @@ export default function ProfilePage() {
 
         {/* ── Sign out ── */}
         <button
-          onClick={async () => { await supabase.auth.signOut(); navigate({ to: '/login' }) }}
+          onClick={async () => { await supabase.auth.signOut(); navigate({ to: '/logg-inn' }) }}
           className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-[var(--muted)]
                      text-sm font-bold hover:bg-red-900/20 hover:border-red-500/30 hover:text-red-400
                      transition-all active:scale-95"
@@ -326,7 +332,85 @@ export default function ProfilePage() {
           Logg ut
         </button>
 
+        {/* ── Delete account (buried) ── */}
+        <button
+          onClick={() => { setDeleteOpen(true); setDeleteConfirm(''); setDeleteError(null) }}
+          className="w-full py-2 text-white/20 text-xs hover:text-red-500/60 transition-colors"
+        >
+          Slett konto
+        </button>
+
       </div>
+
+      {/* ── Delete account confirmation sheet ── */}
+      {deleteOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/70"
+            onClick={() => !deleting && setDeleteOpen(false)}
+          />
+          <div className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl bg-[#111] border-t border-white/10 px-5 pb-10 pt-6"
+               style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 40px)' }}>
+
+            <div className="flex flex-col items-center gap-1 mb-5">
+              <p className="text-3xl">⚠️</p>
+              <h2 className="text-white font-black text-xl">Slett konto</h2>
+              <p className="text-[var(--muted)] text-sm text-center">
+                Dette sletter all din data permanent — XP, merker, venner, alt.
+                Det kan ikke angres.
+              </p>
+            </div>
+
+            <p className="text-xs text-[var(--muted)] mb-2">
+              Skriv brukernavnet ditt (<span className="text-white font-bold">{profile.username}</span>) for å bekrefte:
+            </p>
+            <input
+              value={deleteConfirm}
+              onChange={e => { setDeleteConfirm(e.target.value); setDeleteError(null) }}
+              placeholder={profile.username}
+              disabled={deleting}
+              className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3
+                         text-white placeholder:text-white/20 focus:outline-none focus:border-red-400
+                         text-base mb-3"
+              autoCapitalize="none"
+            />
+
+            {deleteError && (
+              <p className="text-red-400 text-sm mb-3 text-center">{deleteError}</p>
+            )}
+
+            <button
+              disabled={deleteConfirm !== profile.username || deleting}
+              onClick={async () => {
+                setDeleting(true)
+                setDeleteError(null)
+                const { error } = await supabase.functions.invoke('delete-account')
+                if (error) {
+                  setDeleteError('Noe gikk galt. Prøv igjen.')
+                  setDeleting(false)
+                  return
+                }
+                await supabase.auth.signOut()
+                navigate({ to: '/logg-inn' })
+              }}
+              className="w-full py-3 rounded-2xl bg-red-700 text-white font-black text-base
+                         hover:bg-red-600 active:scale-95 transition-all
+                         disabled:opacity-30 disabled:cursor-not-allowed mb-2"
+            >
+              {deleting ? 'Sletter…' : 'Slett kontoen min for alltid'}
+            </button>
+
+            <button
+              onClick={() => setDeleteOpen(false)}
+              disabled={deleting}
+              className="w-full py-3 text-[var(--muted)] text-sm font-bold hover:text-white transition"
+            >
+              Avbryt
+            </button>
+          </div>
+        </>
+      )}
+
     </div>
   )
 }

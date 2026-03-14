@@ -5,6 +5,7 @@ import FillIn from './FillIn'
 import Punctuation from './Punctuation'
 import WordOrder from './WordOrder'
 import SpellIt from './SpellIt'
+import SynonymGame from './SynonymGame'
 
 interface Props {
   question: Question
@@ -52,5 +53,9 @@ export default function QuestionCard({ question, onAnswer, disabled }: Props) {
       )
     case 'spell_it':
       return <SpellIt question={question} onAnswer={onAnswer} disabled={disabled} />
+    case 'synonym':
+      return <SynonymGame question={question} onAnswer={onAnswer} disabled={disabled} />
+    case 'antonym':
+      return <SynonymGame question={question} onAnswer={onAnswer} disabled={disabled} />
   }
 }

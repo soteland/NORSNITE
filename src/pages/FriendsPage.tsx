@@ -135,6 +135,12 @@ export default function FriendsPage() {
 
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3">
+        <button
+          onClick={() => navigate({ to: '/spill' })}
+          className="flex items-center gap-1 text-[var(--muted)] text-sm font-semibold hover:text-white transition px-2 py-1"
+        >
+          ← Spill
+        </button>
         <h1 className="text-2xl font-black text-white">Venner</h1>
         <GameMenu />
       </div>

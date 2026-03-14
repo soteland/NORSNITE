@@ -6,6 +6,8 @@ export type QuestionType =
   | 'comprehension'
   | 'spell_it'
   | 'punctuation'
+  | 'synonym'
+  | 'antonym'
 
 export interface Word {
   id: string
@@ -82,6 +84,26 @@ export interface PunctuationQuestion {
   teachingNote: string    // brief Norwegian grammar tip
 }
 
+// Choose the synonym (same meaning) for the given word
+export interface SynonymQuestion {
+  type: 'synonym'
+  id: string
+  difficulty: number
+  word: string       // the word to find a synonym for
+  correct: string    // the correct synonym
+  choices: string[]  // includes correct; shuffle at runtime
+}
+
+// Choose the antonym (opposite meaning) for the given word
+export interface AntonymQuestion {
+  type: 'antonym'
+  id: string
+  difficulty: number
+  word: string       // the word to find an antonym for
+  correct: string    // the correct antonym
+  choices: string[]  // includes correct; shuffle at runtime
+}
+
 export type Question =
   | WordToImageQuestion
   | ImageToWordQuestion
@@ -90,3 +112,5 @@ export type Question =
   | ComprehensionQuestion
   | SpellItQuestion
   | PunctuationQuestion
+  | SynonymQuestion
+  | AntonymQuestion

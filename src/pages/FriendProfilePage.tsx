@@ -193,18 +193,18 @@ export default function FriendProfilePage() {
 
         {/* ── Achievements ── */}
         <div className="rounded-3xl bg-white/5 border border-white/10 p-4 space-y-4">
-          <h2 className="text-sm uppercase tracking-widest text-[var(--muted)]">Merker</h2>
+          <h2 className="text-xl uppercase tracking-widest text-[var(--muted)] text-center">Merker / Badges</h2>
 
           <div className="space-y-3">
-            <p className="text-xs text-[var(--muted)] font-bold">Milepæler</p>
+            <p className="text-md text-[var(--muted)] font-bold text-center my-4">Milepæler</p>
             <AchievementGrid achievements={ACHIEVEMENTS} earnedKeys={earnedKeys} />
           </div>
           <div className="space-y-3">
-            <p className="text-xs text-[var(--muted)] font-bold">Daglig XP-rekord</p>
+            <p className="text-md text-[var(--muted)] font-bold text-center my-4">Daglig XP-rekord</p>
             <AchievementGrid achievements={DAILY_XP_ACHIEVEMENTS} earnedKeys={earnedKeys} />
           </div>
           <div className="space-y-3">
-            <p className="text-xs text-[var(--muted)] font-bold">Ligaer</p>
+            <p className="text-md text-[var(--muted)] font-bold text-center my-4">Ligaer</p>
             <AchievementGrid achievements={LEAGUE_ACHIEVEMENTS} earnedKeys={earnedKeys} />
           </div>
         </div>

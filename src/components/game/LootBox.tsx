@@ -29,11 +29,50 @@ const RARITY_STYLE: Record<Rarity, { color: string; label: string; glow: string;
 }
 
 interface Reward { xp: number; skip: number; shield: number }
-const REWARDS: Record<Rarity, Reward> = {
-  vanlig:      { xp: 20, skip: 0, shield: 0 },
-  sjelden:     { xp: 40, skip: 1, shield: 0 },
-  episk:       { xp: 60, skip: 0, shield: 1 },
-  legendarisk: { xp: 80, skip: 1, shield: 1 },
+
+/**
+ * Vanlig / Sjelden → fixed XP reward.
+ * Episk / Legendarisk → random roll against loot table at chest-open time.
+ *
+ * Episk table:
+ *   60% → XP 80–160
+ *   15% → 1 hopp-token
+ *   20% → 1-dagers skjold
+ *    5% → 2-dagers skjold
+ *
+ * Legendarisk table:
+ *   50% → XP 160–240
+ *   20% → 1 hopp-token
+ *   18% → 1-dagers skjold
+ *    6% → 2-dagers skjold
+ *    4% → 3-dagers skjold
+ *    2% → 5-dagers skjold
+ */
+function rollReward(rarity: Rarity): Reward {
+  if (rarity === 'vanlig')  return { xp: 25, skip: 0, shield: 0 }
+  if (rarity === 'sjelden') {
+    const r = Math.random()
+    if (r < 0.80) return { xp: 50, skip: 0, shield: 0 }
+    if (r < 0.90) return { xp: 0,  skip: 1, shield: 0 }
+    return              { xp: 0,  skip: 0, shield: 1 }
+  }
+
+  const r = Math.random()
+
+  if (rarity === 'episk') {
+    if (r < 0.60) return { xp: 80 + Math.floor(Math.random() * 81),  skip: 0, shield: 0 }
+    if (r < 0.75) return { xp: 0, skip: 1, shield: 0 }
+    if (r < 0.95) return { xp: 0, skip: 0, shield: 1 }
+    return              { xp: 0, skip: 0, shield: 2 }
+  }
+
+  // legendarisk
+  if (r < 0.50) return { xp: 160 + Math.floor(Math.random() * 81), skip: 0, shield: 0 }
+  if (r < 0.70) return { xp: 0, skip: 1, shield: 0 }
+  if (r < 0.88) return { xp: 0, skip: 0, shield: 1 }
+  if (r < 0.94) return { xp: 0, skip: 0, shield: 2 }
+  if (r < 0.98) return { xp: 0, skip: 0, shield: 3 }
+  return              { xp: 0, skip: 0, shield: 5 }
 }
 
 /** Roll for rarity upgrade after each click */
@@ -56,19 +95,20 @@ function rollUpgrade(current: Rarity): Rarity {
   return current // legendarisk — can't go higher
 }
 
-function rewardLines(rarity: Rarity): string[] {
-  const r = REWARDS[rarity]
-  const lines: string[] = [`✨ +${r.xp} XP`]
-  if (r.skip)   lines.push('⚡ Hopp-token!')
-  if (r.shield) lines.push('🛡️ Strekk-skjold')
+function rewardLines(reward: Reward): string[] {
+  const lines: string[] = []
+  if (reward.xp)     lines.push(`✨ +${reward.xp} XP`)
+  if (reward.skip)   lines.push(`⚡ ${reward.skip} hopp-token!`)
+  if (reward.shield) lines.push(`🛡️ ${reward.shield}-dagers strekk-skjold!`)
   return lines
 }
 
 export default function LootBox({ userId, onComplete }: Props) {
-  const [phase,   setPhase]   = useState<Phase>('intro')
-  const [rarity,  setRarity]  = useState<Rarity>('vanlig')
-  const [prev,    setPrev]    = useState<Rarity | null>(null)   // for "upgraded!" flash
-  const [shakeKey, setShakeKey] = useState(0)                    // increment to re-trigger shake
+  const [phase,    setPhase]    = useState<Phase>('intro')
+  const [rarity,   setRarity]   = useState<Rarity>('vanlig')
+  const [prev,     setPrev]     = useState<Rarity | null>(null)
+  const [shakeKey, setShakeKey] = useState(0)
+  const [reward,   setReward]   = useState<Reward | null>(null)
   const applyingRef = useRef(false)
 
   // Auto-close after reveal
@@ -84,9 +124,10 @@ export default function LootBox({ userId, onComplete }: Props) {
     applyingRef.current = true
     setPhase('applying')
 
-    const r = REWARDS[finalRarity]
+    const rolled = rollReward(finalRarity)
+    setReward(rolled)
+
     try {
-      // Fetch current profile to compute new values (client-side — non-competitive game)
       const { data: profile } = await supabase
         .from('profiles')
         .select('total_xp, skip_tokens, streak_shield_days')
@@ -95,9 +136,9 @@ export default function LootBox({ userId, onComplete }: Props) {
 
       if (profile) {
         await supabase.from('profiles').update({
-          total_xp:           profile.total_xp + r.xp,
-          skip_tokens:        profile.skip_tokens + r.skip,
-          streak_shield_days: Math.min(7, profile.streak_shield_days + r.shield),
+          total_xp:           profile.total_xp + rolled.xp,
+          skip_tokens:        Math.min(5, profile.skip_tokens + rolled.skip),
+          streak_shield_days: Math.min(7, profile.streak_shield_days + rolled.shield),
           rounds_since_loot:  0,
         }).eq('id', userId)
       }
@@ -285,7 +326,7 @@ export default function LootBox({ userId, onComplete }: Props) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              {rewardLines(rarity).map((line, i) => (
+              {reward && rewardLines(reward).map((line, i) => (
                 <p key={i} className="text-2xl font-black text-white">{line}</p>
               ))}
             </motion.div>
