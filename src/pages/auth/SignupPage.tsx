@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { supabase } from '@/lib/supabase/client'
 import { AuthCard } from '@/components/layout/AuthCard'
+import { TurnstileWidget } from '@/components/ui/TurnstileWidget'
 
 const schema = z.object({
   email: z.string().email('Ugyldig e-postadresse'),
@@ -19,19 +20,26 @@ type FormData = z.infer<typeof schema>
 export default function SignupPage() {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
+  const [turnstileOk, setTurnstileOk] = useState(false)
+  const turnstileTokenRef = useRef<string | null>(null)
+
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
 
   const onSubmit = async ({ email, password }: FormData) => {
+    if (!turnstileOk) return
     setError(null)
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { captchaToken: turnstileTokenRef.current ?? undefined },
+    })
     if (error) {
       setError(error.message === 'User already registered'
         ? 'Denne e-posten er allerede registrert. Prøv å logge inn.'
         : 'Noe gikk galt. Prøv igjen!')
     } else {
-      // After signup, go to onboarding to pick username + avatar
       navigate({ to: '/velkommen' })
     }
   }
@@ -75,13 +83,22 @@ export default function SignupPage() {
           {errors.confirmPassword && <p className="text-[var(--danger)] text-sm mt-1">{errors.confirmPassword.message}</p>}
         </div>
 
+        <TurnstileWidget
+          onSuccess={(token) => { turnstileTokenRef.current = token; setTurnstileOk(true) }}
+          onExpire={() => { turnstileTokenRef.current = null; setTurnstileOk(false) }}
+        />
+
         {error && (
           <p className="bg-red-950/50 border border-[var(--danger)] text-[var(--danger)] rounded-lg px-4 py-2 text-sm">
             {error}
           </p>
         )}
 
-        <button type="submit" disabled={isSubmitting} className="btn-primary">
+        <button
+          type="submit"
+          disabled={isSubmitting || !turnstileOk}
+          className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
+        >
           {isSubmitting ? 'Lager konto…' : 'Lag konto 🚀'}
         </button>
       </form>
