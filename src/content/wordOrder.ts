@@ -405,5 +405,172 @@ export const wordOrderQuestions: WordOrderQuestion[] = [
     id: 'wo-062',
     difficulty: 10,
     correct: ['De', 'løste', 'problemet', 'raskt', 'fordi', 'de', 'samarbeidet'],
+    },
+    // ── Difficulty 1 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-063',
+    difficulty: 1,
+    correct: ['Ballen', 'er', 'rund'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-064',
+    difficulty: 1,
+    correct: ['Fotballen', 'er', 'rund'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-065',
+    difficulty: 1,
+    correct: ['Det', 'snør', 'ute'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-066',
+    difficulty: 1,
+    correct: ['Det', 'er', 'sol', 'ute'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-067',
+    difficulty: 1,
+    correct: ['Vannet', 'er', 'varmt'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-068',
+    difficulty: 1,
+    correct: ['Vannet', 'er', 'kaldt'],
+  },
+
+  // ── Difficulty 2 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-069',
+    difficulty: 2,
+    correct: ['Golfballen', 'er', 'liten'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-070',
+    difficulty: 2,
+    correct: ['Basketballen', 'er', 'oransje'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-071',
+    difficulty: 2,
+    correct: ['Elefanten', 'er', 'stor'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-072',
+    difficulty: 2,
+    correct: ['Geparden', 'løper', 'fort'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-073',
+    difficulty: 2,
+    correct: ['Fuglene', 'flyr', 'høyt'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-074',
+    difficulty: 2,
+    correct: ['De', 'spiller', 'fotball'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-075',
+    difficulty: 2,
+    correct: ['Trening', 'er', 'sunt'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-076',
+    difficulty: 2,
+    correct: ['Øvelse', 'gjør', 'mester'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-077',
+    difficulty: 2,
+    correct: ['Vinduet', 'er', 'firkantet'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-078',
+    difficulty: 2,
+    correct: ['Jeg', 'er', 'glad', 'i', 'mamma'],
+  },
+
+  // ── Difficulty 3 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-079',
+    difficulty: 3,
+    correct: ['Det', 'er', 'sol', 'på', 'stranda'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-080',
+    difficulty: 3,
+    correct: ['Fotballen', 'flyr', 'i', 'mål'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-081',
+    difficulty: 3,
+    correct: ['Læreren', 'skriver', 'på', 'tavla'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-082',
+    difficulty: 3,
+    correct: ['Familien', 'spiser', 'middag', 'sammen'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-083',
+    difficulty: 3,
+    correct: ['Vennene', 'leker', 'i', 'friminuttet'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-084',
+    difficulty: 3,
+    correct: ['Politiet', 'passer', 'på', 'oss'],
+  },
+
+  // ── Difficulty 4 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-085',
+    difficulty: 4,
+    correct: ['Hunden', 'spiste', 'leksene', 'mine'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-086',
+    difficulty: 4,
+    correct: ['Brannvesenet', 'slukker', 'branner'],
+  },
+
+  // ── Difficulty 5 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-087',
+    difficulty: 5,
+    correct: ['Jeg', 'bruker', 'paraply', 'når', 'det', 'regner'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-088',
+    difficulty: 5,
+    correct: ['Vask', 'hendene', 'før', 'du', 'spiser'],
   },
 ]
+
+

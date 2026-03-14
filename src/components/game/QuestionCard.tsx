@@ -28,8 +28,8 @@ export default function QuestionCard({ question, onAnswer, disabled }: Props) {
       // Shown as fill_in style: passage + question + 3 choices
       return (
         <div className="flex flex-col items-center gap-5 w-full">
-          <p className="text-sm uppercase tracking-widest text-[var(--muted)]">Les og forstå</p>
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 max-w-sm text-white text-base leading-relaxed">
+          <p className="text-base font-bold tracking-wide text-[var(--muted)]">Les og forstå</p>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 max-w-sm text-white text-xl leading-relaxed">
             {question.passage}
           </div>
           <p className="text-lg font-bold text-white text-center max-w-sm">{question.question}</p>

@@ -60,7 +60,7 @@ export default function VikingMessage({ state }: Props) {
         className="w-1/2 h-auto flex-shrink-0 drop-shadow-lg"
       />
       <div className="text-left">
-        <p className="text-2xl font-black text-white leading-tight">{msg.headline}</p>
+        <p className="text-xl font-black text-white leading-tight">{msg.headline}</p>
         <p className="text-md text-white/75 mt-1">{msg.sub}</p>
       </div>
     </div>

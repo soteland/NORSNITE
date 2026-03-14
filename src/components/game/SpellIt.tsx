@@ -131,7 +131,7 @@ export default function SpellIt({ question, onAnswer, disabled }: Props) {
                 key={tile.id}
                 disabled={disabled || tile.used}
                 onClick={() => tapTile(tile)}
-                className={`w-11 h-11 rounded-xl text-lg font-black transition-all
+                className={`w-11 h-11 rounded-xl text-xl font-black transition-all
                   border-2 select-none
                   ${tile.used
                     ? 'bg-white/5 border-white/5 text-white/0 cursor-not-allowed'

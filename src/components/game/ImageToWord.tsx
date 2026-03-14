@@ -14,7 +14,7 @@ export default function ImageToWord({ question, onAnswer, disabled }: Props) {
   return (
     <div className="flex flex-col items-center gap-6 w-full">
       <div className="text-center">
-        <p className="text-sm uppercase tracking-widest text-[var(--muted)] mb-3">
+        <p className="text-base font-bold tracking-wide text-[var(--muted)] mb-3">
           Hvilket ord passer til bildet?
         </p>
         <span className="text-9xl">{question.target.emoji}</span>

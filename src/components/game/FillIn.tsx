@@ -23,10 +23,10 @@ export default function FillIn({ question, onAnswer, disabled }: Props) {
   return (
     <div className="flex flex-col items-center gap-6 w-full">
       <div className="text-center max-w-sm">
-        <p className="text-sm uppercase tracking-widest text-[var(--muted)] mb-3">
+        <p className="text-base font-bold tracking-wide text-[var(--muted)] mb-3">
           Fyll inn riktig ord
         </p>
-        <p className="text-2xl font-semibold text-white leading-relaxed">
+        <p className="text-2xl font-bold text-white leading-relaxed">
           {renderSentence(question.sentence)}
         </p>
       </div>

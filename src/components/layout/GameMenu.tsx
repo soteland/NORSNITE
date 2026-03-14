@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuth } from '@/lib/auth/AuthContext'
 import { useMute } from '@/lib/useMute'
+import HowToPlaySheet from './HowToPlaySheet'
 
 interface Props {
   /** Extra classes for the trigger button */
@@ -10,6 +11,7 @@ interface Props {
 
 export default function GameMenu({ className = '' }: Props) {
   const [open, setOpen] = useState(false)
+  const [howToPlay, setHowToPlay] = useState(false)
   const { speechMuted, sfxMuted, toggleSpeech, toggleSfx } = useMute()
   const { signOut } = useAuth()
   const navigate = useNavigate()
@@ -29,6 +31,8 @@ export default function GameMenu({ className = '' }: Props) {
 
   return (
     <>
+      <HowToPlaySheet open={howToPlay} onClose={() => setHowToPlay(false)} />
+
       {/* Trigger — hamburger icon */}
       <button
         onClick={() => setOpen(true)}
@@ -116,6 +120,16 @@ export default function GameMenu({ className = '' }: Props) {
               {label}
             </button>
           ))}
+
+          {/* How to play */}
+          <button
+            onClick={() => { close(); setHowToPlay(true) }}
+            className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl
+                       hover:bg-white/10 transition text-left text-white font-semibold text-base"
+          >
+            <span className="text-xl">❓</span>
+            Slik spiller du
+          </button>
 
           {/* Divider */}
           <div className="h-px bg-[var(--border)] my-2" />

@@ -55,7 +55,6 @@ export const adjectives: string[] = [
   'Flott',
   'Frisk',
   'Ivrig',
-  'Kåt',
   'Lunefull',
   'Mystisk',
   'Nifse',

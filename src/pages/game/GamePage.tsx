@@ -6,6 +6,7 @@ import { useGameStore } from '@/lib/store/gameStore'
 import { calculateXp, rollCrown } from '@/lib/xp'
 import { buildRound, getCorrectAnswerText } from '@/lib/roundController'
 import { speak, speakThen, playCorrect, playWrong, playRoundDone, playPerfect } from '@/lib/speech'
+import { useAchievements } from '@/hooks/useAchievements'
 import QuestionCard from '@/components/game/QuestionCard'
 import RoundResult from '@/components/game/RoundResult'
 import LootBox from '@/components/game/LootBox'
@@ -23,10 +24,12 @@ export default function GamePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { comebackBonus, activateComeback, clearComeback } = useGameStore()
+  const { checkAndGrant } = useAchievements(user?.id)
 
   const [phase, setPhase] = useState<Phase>('loading')
   const [profileBefore, setProfileBefore] = useState<ProfileRow | null>(null)
   const [profileAfter, setProfileAfter] = useState<ProfileRow | null>(null)
+  const [newAchievementKeys, setNewAchievementKeys] = useState<string[]>([])
   const [queue, setQueue] = useState<Question[]>([])
   const [originalCount, setOriginalCount] = useState(0)
   const [qIndex, setQIndex] = useState(0)
@@ -38,6 +41,7 @@ export default function GamePage() {
   const [hintVisible, setHintVisible] = useState(false)
   const [comebackJustActivated, setComebackJustActivated] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [confirmSkip, setConfirmSkip] = useState(false)
 
   // Capture comebackBonus at round start so it doesn't change mid-round
   const comebackAtStart = useRef(false)
@@ -54,6 +58,7 @@ export default function GamePage() {
     setTeachingNote(null)
     setHintVisible(false)
     setComebackJustActivated(false)
+    setNewAchievementKeys([])
     setProfileAfter(null)
     comebackAtStart.current = comebackBonus
 
@@ -133,6 +138,11 @@ export default function GamePage() {
     setProfileAfter(updatedProfile)
     xpResultRef.current = xpResult
 
+    // ── Achievement check ─────────────────────────────────────────────────────
+    checkAndGrant(updatedProfile).then(newKeys => {
+      setNewAchievementKeys(newKeys)
+    }).catch(console.error)
+
     // ── Loot box trigger ──────────────────────────────────────────────────────
     const isFirstEverRound = profileBefore.last_active_date === null
     const normalTrigger = isFirstEverRound || (updatedProfile?.rounds_since_loot ?? 0) >= 5
@@ -191,8 +201,12 @@ export default function GamePage() {
 
   function handleSkip() {
     if (answerStatus !== 'idle' || !profileBefore || profileBefore.skip_tokens <= 0) return
+    setConfirmSkip(true)
+  }
+
+  function confirmAndSkip() {
+    setConfirmSkip(false)
     setUsedSkip(true)
-    // advanceQueue sets phase='loading' via endRound if this is the last question
     advanceQueue(qIndex + 1, queue, correctCount, true, crownActive)
   }
 
@@ -257,6 +271,7 @@ export default function GamePage() {
         xpResult={xpResultRef.current}
         crownActive={crownActive}
         comebackJustActivated={comebackJustActivated}
+        newAchievementKeys={newAchievementKeys}
         onPlayAgain={initRound}
       />
     )
@@ -267,6 +282,47 @@ export default function GamePage() {
   return (
     <div className="min-h-[100dvh] flex flex-col"
          style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+
+      {/* Skip confirm sheet */}
+      {confirmSkip && (
+        <>
+          <div className="fixed inset-0 z-40 bg-black/60" onClick={() => setConfirmSkip(false)} />
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)] border-t border-[var(--border)] rounded-t-3xl px-5 pt-4"
+               style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 24px)' }}>
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mb-4" />
+            <div className="flex items-start gap-3 mb-5">
+              <span className="text-4xl">⚡</span>
+              <div>
+                <p className="text-lg font-black text-white">Bruk hjelpemiddel?</p>
+                <p className="text-[var(--muted)] text-sm mt-1 leading-snug">
+                  Du hopper over dette spørsmålet og får base-XP for det.
+                  Men du mister sjansen for perfekt runde og krone-bonus denne runden.
+                </p>
+                <p className="text-yellow-400 text-sm font-bold mt-2">
+                  Du har {profileBefore?.skip_tokens ?? 0} hjelpemiddel igjen.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmSkip(false)}
+                className="flex-1 py-3 rounded-2xl bg-white/10 border border-white/20
+                           text-white font-bold text-base hover:bg-white/20 transition"
+              >
+                Avbryt
+              </button>
+              <button
+                onClick={confirmAndSkip}
+                className="flex-1 py-3 rounded-2xl bg-yellow-600 border border-yellow-500
+                           text-white font-black text-base hover:bg-yellow-500 transition"
+              >
+                ⚡ Bruk det!
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         {/* Progress label */}
@@ -313,7 +369,7 @@ export default function GamePage() {
       {/* Comeback bonus indicator */}
       {comebackAtStart.current && (
         <div className="mx-4 mt-2 px-3 py-1.5 rounded-xl bg-yellow-600/20 border border-yellow-500/30 text-center">
-          <p className="text-yellow-300 text-xs font-bold">⚡ COMEBACK-BONUS aktiv! +25% XP denne runden</p>
+          <p className="text-yellow-300 text-sm font-bold">⚡ COMEBACK-BONUS aktiv! +25% XP denne runden</p>
         </div>
       )}
 
@@ -321,7 +377,7 @@ export default function GamePage() {
       <div className="mx-4 mt-3 min-h-[76px]">
         {answerStatus === 'correct' && (
           <div className="rounded-2xl bg-green-500/20 border-2 border-green-400/50 py-4 text-center">
-            <p className="text-green-300 font-black text-2xl">✓ Riktig!</p>
+            <p className="text-green-300 font-black text-3xl">✓ Riktig!</p>
           </div>
         )}
         {answerStatus === 'finishing' && (
@@ -331,11 +387,11 @@ export default function GamePage() {
         )}
         {(answerStatus === 'wrong' || answerStatus === 'showing_correct') && (
           <div className="rounded-2xl bg-red-500/20 border-2 border-red-400/50 py-3 px-4 text-center">
-            <p className="text-red-300 font-black text-xl">✗ Feil!</p>
+            <p className="text-red-300 font-black text-2xl">✗ Feil!</p>
             {/* Reserved row for correct-answer reveal — always present to hold height */}
             <div className="min-h-[28px] mt-1">
               {answerStatus === 'showing_correct' && (
-                <p className="text-white font-bold">
+                <p className="text-white text-lg font-bold">
                   Riktig: <span className="text-yellow-300">{getCorrectAnswerText(currentQuestion)}</span>
                 </p>
               )}
@@ -357,7 +413,7 @@ export default function GamePage() {
       <div className="mx-4 mb-4 min-h-[52px]">
         {answerStatus === 'showing_correct' && teachingNote && hintVisible && (
           <div className="rounded-2xl bg-amber-500/20 border-2 border-amber-400/50 px-4 py-3 text-center">
-            <p className="text-amber-200 font-bold text-sm">💡 {teachingNote}</p>
+            <p className="text-amber-200 font-bold text-base">💡 {teachingNote}</p>
           </div>
         )}
       </div>

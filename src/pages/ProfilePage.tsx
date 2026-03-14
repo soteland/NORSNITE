@@ -3,6 +3,9 @@ import { useNavigate } from '@tanstack/react-router'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/auth/AuthContext'
 import { getLeague, xpToNextLeague, LEAGUE_THRESHOLDS } from '@/lib/xp'
+import { useAchievements } from '@/hooks/useAchievements'
+import { ACHIEVEMENTS, DAILY_XP_ACHIEVEMENTS, LEAGUE_ACHIEVEMENTS } from '@/lib/achievements'
+import { AchievementGrid } from '@/components/game/AchievementBadge'
 import {
   EYES, EYEBROWS, MOUTH, GLASSES,
   SKIN_TONES, FUN_COLORS,
@@ -53,6 +56,7 @@ function FeaturePicker({ label, value, options, onChange }: {
 export default function ProfilePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { earnedKeys, loading: achievementsLoading } = useAchievements(user?.id)
 
   const [profile, setProfile] = useState<ProfileRow | null>(null)
   const [loading, setLoading] = useState(true)
@@ -289,6 +293,28 @@ export default function ProfilePage() {
             ))}
           </div>
         </div>
+
+        {/* ── Achievements ── */}
+        {!achievementsLoading && (
+          <div className="rounded-3xl bg-white/5 border border-white/10 p-4 space-y-4">
+            <h2 className="text-sm uppercase tracking-widest text-[var(--muted)]">Merker</h2>
+
+            <div className="space-y-3">
+              <p className="text-xs text-[var(--muted)] font-bold">Milepæler</p>
+              <AchievementGrid achievements={ACHIEVEMENTS} earnedKeys={earnedKeys} />
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-xs text-[var(--muted)] font-bold">Daglig XP-rekord</p>
+              <AchievementGrid achievements={DAILY_XP_ACHIEVEMENTS} earnedKeys={earnedKeys} />
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-xs text-[var(--muted)] font-bold">Ligaer</p>
+              <AchievementGrid achievements={LEAGUE_ACHIEVEMENTS} earnedKeys={earnedKeys} />
+            </div>
+          </div>
+        )}
 
         {/* ── Sign out ── */}
         <button

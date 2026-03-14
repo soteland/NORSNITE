@@ -17,7 +17,7 @@ Inspired by Fortnite's progression loop and Duolingo's minigame variety.
 - **Client state**: Zustand (spilltilstand, aktiv runde, crown)
 - **UI**: shadcn/ui + Tailwind CSS
 - **Animasjoner**: Framer Motion (Victory Royale, XP-bar, league promotion)
-- **Auth**: Google OAuth + Microsoft OAuth (no passwords). **Microsoft school tenant caveat**: school Microsoft accounts may require IT admin consent before OAuth works. Test with a real school account before advertising class use. Gmail is sufficient for launch — Microsoft school OAuth is best-effort.
+- **Auth**: Google OAuth + Microsoft OAuth (no passwords). **ON ICE** — deprioritized; email/password works for now. **Microsoft school tenant caveat**: school Microsoft accounts may require IT admin consent before OAuth works. Test with a real school account before advertising class use. Gmail is sufficient for launch — Microsoft school OAuth is best-effort.
 - **Tiers**: Bronze → Silver → Gold → Platinum → Diamond → Elite → Champion → Unreal
 - **Minigames**: 7 types, unlocked progressively by league
 - **Avatar**: Simple 2D character with unlockable outfits and backgrounds
@@ -61,7 +61,7 @@ Inspired by Fortnite's progression loop and Duolingo's minigame variety.
   | 8 | 10+ bokstaver, abstrakte | Komplekse setninger |
   | 9 | Avansert vokabular | Idiomatiske fraser |
   | 10 | Ekspertnivå | Langt avsnitt, full forståelse |
-- **XP-skalering**: Hvert league-tier krever 15% mer XP enn forrige (svakt eksponensielt på terskler, ikke per oppgave). Base XP: 10 XP per riktig svar. Bonuser: perfekt runde +25%, crown win +50%, comeback +25%. **Ingen daglig tak** — spill mer, få mer. Terskler (kumulativ): Bronze 0 | Silver 1 000 | Gold 2 150 | Platinum 3 472 | Diamond 4 993 | Elite 6 742 | Champion 8 753 | Unreal 11 066. Total til Unreal ≈ 11 066 XP.
+- **XP-skalering**: Hvert league-tier krever 15% mer XP enn forrige (svakt eksponensielt på terskler, ikke per oppgave). Base XP: 5 XP per riktig svar. Bonuser: perfekt runde +25%, crown win +50%, comeback +25%. **Ingen daglig tak** — spill mer, få mer. Terskler (kumulativ): Bronze 0 | Silver 1 000 | Gold 2 150 | Platinum 3 472 | Diamond 4 993 | Elite 6 742 | Champion 8 753 | Unreal 11 066. Total til Unreal ≈ 11 066 XP.
 - **Rundelengde**: Styres av liganivå — Bronse: 5 spørsmål | Sølv: 6 | Gull: 7 | Platina: 8 | Diamant: 9 | Elite–Unreal: 10. Animasjoner og loot box tar lik andel av spilletiden uansett nivå. Høyere liga → naturlig mer XP per runde (flere spørsmål).
 - **Innhold**: Schema defineres i kode, mengde genereres med GPT-4/5 mini etterpå. Kategorier avklares separat.
 - **GDPR**: Personvernerklæring i appen = tilstrekkelig. Prosjektet open source.
@@ -206,6 +206,8 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
 | | 💎 | Diamantdag | 1 000 XP på én dag | Episk |
 | | 🌠 | Stjerneskudd | 1 500 XP på én dag | Episk |
 | | 👑⚡ | Dagkonge | 2 000 XP på én dag | Legendarisk |
+| | ⚜️👑 | Viking-konge | 2 500 XP på én dag | Legendarisk |
+| | 🗡️⚜️ | Viking-gud | 3000 XP på én dag | Legendarisk |
 
 \+ League-badge per tier: 🥉🥈🥇💜💙🔥👑⚡
 
@@ -219,7 +221,7 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
 - [ ] Set up **two** Supabase projects: `norsnite-dev` and `norsnite-prod` — migrations from day 1
 - [ ] Create `supabase/migrations/` folder with initial schema (profiles, xp_log, friends, unlocks, earned_achievements)
 - [ ] Add GitHub Actions keep-alive workflow (`.github/workflows/keep-alive.yml`) — weekly ping to dev + prod Supabase to prevent 7-day free-tier pause
-- [ ] Wire Google + Microsoft OAuth via Supabase Auth
+- [ ] Wire Google + Microsoft OAuth via Supabase Auth — **ON ICE**
 - [ ] Session handling and protected routes (TanStack Router guards)
 - [ ] Cloudflare Pages config (`wrangler.toml`)
 - [ ] Environment variables pattern (`.env.local` for dev, Cloudflare secrets for prod)
@@ -261,12 +263,13 @@ Placeholder: CSS badges nå. Kan byttes til ekte logo-stil kunst senere uten å 
   - Show `teachingNote` after each answer (correct or wrong) — teaches the rule
 
 ### Phase 5 — Profile & Progression
-- [ ] Profile page: avatar editor, XP bar, league badge, streak, crown count, badges
-- [ ] Avatar cosmetic system: DiceBear options (eyes/eyebrows/mouth/glasses) + 13 color choices (grouped: 5 skin tones + 8 fun colors)
+- [x] Profile page: avatar editor, XP bar, league badge, streak, crown count, badges
+- [x] Avatar cosmetic system: DiceBear options (eyes/eyebrows/mouth/glasses) + 13 color choices (grouped: 5 skin tones + 8 fun colors)
 - [ ] Unlockable cosmetics: CSS layer around avatar card — league backgrounds, Champion+ frame, crown icon on Crown Win
-- [ ] Crown Win icon display: shown on profile until end of current session (not 24h — it's a per-win highlight; permanent badge earned after first Crown Win)
-- [ ] Loot box animation: 3-click (shake, shake, explode). Framer Motion. Duplicates → XP.
-- [ ] Comeback-bonus splash: full-screen Framer Motion, +25% XP, Zustand only, voided on reload
+- [x] Crown Win icon display: shown on profile until end of current session (not 24h — it's a per-win highlight; permanent badge earned after first Crown Win)
+- [x] Loot box animation: 3-click (shake, shake, explode). Framer Motion. Duplicates → XP.
+- [x] Comeback-bonus splash: full-screen Framer Motion, +25% XP, Zustand only, voided on reload
+- [x] Achievement badges: 19 milestone + 9 daily XP + 8 league badges. CSS radial-gradient circles with neon glow. Auto-checked after each round, displayed on profile and round result screen. Earned achievements stored in `earned_achievements` table.
 
 ### Phase 6 — Friends
 - [ ] Add friend by exact username search
@@ -415,4 +418,4 @@ create policy "achievements_insert_own" on earned_achievements for insert with c
 | Champion | 8 753 |
 | Unreal | 11 066 |
 
-Base: 10 XP per riktig svar. Ingen daglig tak.
+Base: 5 XP per riktig svar. Ingen daglig tak.

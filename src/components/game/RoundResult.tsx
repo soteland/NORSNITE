@@ -6,6 +6,7 @@ import { getLeague, xpToNextLeague, LEAGUE_THRESHOLDS } from '@/lib/xp'
 import GameMenu from '@/components/layout/GameMenu'
 import DifficultyCheck from './DifficultyCheck'
 import VikingMessage from './VikingMessage'
+import NewAchievements from './NewAchievements'
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row']
 
@@ -15,6 +16,7 @@ interface Props {
   xpResult: XpResult
   crownActive: boolean
   comebackJustActivated: boolean  // true if 0-correct + lucky roll this round
+  newAchievementKeys?: string[]
   onPlayAgain: () => void
 }
 
@@ -39,6 +41,7 @@ export default function RoundResult({
   xpResult,
   crownActive: _crownActive,
   comebackJustActivated,
+  newAchievementKeys = [],
   onPlayAgain,
 }: Props) {
   // Show full-screen comeback splash first, then dismiss to normal result
@@ -224,6 +227,13 @@ export default function RoundResult({
               {!streakKept && profileBefore.streak_days > 1 && (
                 <span className="text-red-400 text-sm">(strekk brutt)</span>
               )}
+            </motion.div>
+          )}
+
+          {/* New achievements */}
+          {newAchievementKeys.length > 0 && (
+            <motion.div variants={fadeUp} className="w-full max-w-sm">
+              <NewAchievements newKeys={newAchievementKeys} />
             </motion.div>
           )}
 

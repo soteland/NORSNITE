@@ -16,13 +16,13 @@ export type League = (typeof LEAGUES)[number]
 // Cumulative XP required to reach each league
 export const LEAGUE_THRESHOLDS: Record<League, number> = {
   Bronze:   0,
-  Silver:   1_000,
-  Gold:     2_150,
-  Platinum: 3_472,
-  Diamond:  4_993,
-  Elite:    6_742,
-  Champion: 8_753,
-  Unreal:   11_066,
+  Silver:   500,
+  Gold:     1_075,
+  Platinum: 1_736,
+  Diamond:  2_497,
+  Elite:    3_371,
+  Champion: 4_377,
+  Unreal:   5_533,
 }
 
 // Minimum difficulty level enforced at each league
@@ -49,7 +49,7 @@ export const ROUND_LENGTH: Record<League, number> = {
   Unreal:   9,
 }
 
-export const BASE_XP = 10 // per correct answer
+export const BASE_XP = 5 // per correct answer
 
 export function getLeague(totalXp: number): League {
   const tiers = [...LEAGUES].reverse()

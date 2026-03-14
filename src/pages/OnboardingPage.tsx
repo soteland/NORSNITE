@@ -11,18 +11,7 @@ import {
   type AvatarConfig,
 } from '@/lib/avatar'
 import AvatarPreview from '@/components/AvatarPreview'
-
-// ── League display for rules slide ───────────────────────────────────────────
-const LEAGUES_DISPLAY = [
-  { name: 'Bronse',   emoji: '🥉', color: '#cd7f32' },
-  { name: 'Sølv',    emoji: '🥈', color: '#aaaaaa' },
-  { name: 'Gull',    emoji: '🥇', color: '#f59e0b' },
-  { name: 'Platina', emoji: '💜', color: '#a855f7' },
-  { name: 'Diamant', emoji: '💙', color: '#3b82f6' },
-  { name: 'Elite',   emoji: '🔥', color: '#ef4444' },
-  { name: 'Champion',emoji: '👑', color: '#f59e0b' },
-  { name: 'Unreal',  emoji: '⚡', color: '#06b6d4' },
-]
+import { HowToPlayContent } from '@/components/layout/HowToPlaySheet'
 
 // ── PascalCase username validation ────────────────────────────────────────────
 const PASCAL_RE = /^[A-ZÆØÅ][a-zA-ZæøåÆØÅ0-9]{2,19}$/
@@ -72,7 +61,6 @@ export default function OnboardingPage() {
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [slideDir, setSlideDir] = useState(1)
-  const [rulesSlide, setRulesSlide] = useState<1 | 2>(1)
 
   // Username state
   const [username, setUsername] = useState('')
@@ -318,84 +306,10 @@ export default function OnboardingPage() {
     >
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-black">Slik spiller du 🏆</h2>
-        <button type="button" onClick={handleComplete} disabled={submitting} className="text-[var(--muted)] text-sm hover:text-[var(--accent)] transition-colors">
+        <button type="button" onClick={handleComplete} disabled={submitting}
+          className="text-[var(--muted)] text-sm hover:text-[var(--accent)] transition-colors">
           Hopp over
         </button>
-      </div>
-
-      <AnimatePresence mode="wait" custom={1}>
-        {rulesSlide === 1 ? (
-          <motion.div
-            key="rules1"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-            className="flex flex-col gap-4"
-          >
-            <div className="rounded-xl border border-[var(--border)] p-5 flex flex-col gap-3" style={{ background: 'var(--bg)' }}>
-              <div className="flex items-start gap-3">
-                <span className="text-3xl">⭐</span>
-                <div>
-                  <p className="font-bold text-lg">Tjen XP!</p>
-                  <p className="text-[var(--muted)] text-sm mt-1">Svar riktig på spørsmål for å tjene XP. Perfekt runde? <strong className="text-[var(--gold)]">+25% bonus!</strong> Vinn med krone? <strong className="text-[var(--gold)]">+50% bonus!</strong></p>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-xl border border-[var(--border)] p-5 flex flex-col gap-3" style={{ background: 'var(--bg)' }}>
-              <div className="flex items-start gap-3">
-                <span className="text-3xl">🔥</span>
-                <div>
-                  <p className="font-bold text-lg">Hold strekken!</p>
-                  <p className="text-[var(--muted)] text-sm mt-1">Spill hver dag for å bygge opp strekken din. Jo lenger strekk, jo kulere du er!</p>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-xl border border-[var(--border)] p-5 flex flex-col gap-3" style={{ background: 'var(--bg)' }}>
-              <div className="flex items-start gap-3">
-                <span className="text-3xl">📦</span>
-                <div>
-                  <p className="font-bold text-lg">Vinn loot!</p>
-                  <p className="text-[var(--muted)] text-sm mt-1">Etter hver 5. runde åpner du en kiste med kule premier og bonuser!</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="rules2"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-            className="flex flex-col gap-4"
-          >
-            <p className="text-[var(--muted)] text-sm">Saml XP og klatr gjennom ligaene!</p>
-            <div className="grid grid-cols-4 gap-2">
-              {LEAGUES_DISPLAY.map(l => (
-                <div key={l.name} className="flex flex-col items-center gap-1 rounded-lg p-2 border border-[var(--border)]" style={{ background: 'var(--bg)' }}>
-                  <span className="text-2xl">{l.emoji}</span>
-                  <span className="text-xs font-bold text-center" style={{ color: l.color }}>{l.name}</span>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-xl border border-[var(--border)] p-4" style={{ background: 'var(--bg)' }}>
-              <div className="flex items-start gap-3">
-                <span className="text-3xl">👑</span>
-                <div>
-                  <p className="font-bold">Crown Win!</p>
-                  <p className="text-[var(--muted)] text-sm mt-1">10% sjanse for en kamp med krone. Svar riktig på ALT → få +50% XP!</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Slide dots */}
-      <div className="flex justify-center gap-2">
-        <button type="button" onClick={() => setRulesSlide(1)} className="w-2 h-2 rounded-full transition-colors" style={{ background: rulesSlide === 1 ? 'var(--accent)' : 'var(--border)' }} aria-label="Side 1" />
-        <button type="button" onClick={() => setRulesSlide(2)} className="w-2 h-2 rounded-full transition-colors" style={{ background: rulesSlide === 2 ? 'var(--accent)' : 'var(--border)' }} aria-label="Side 2" />
       </div>
 
       {submitError && (
@@ -404,21 +318,11 @@ export default function OnboardingPage() {
         </p>
       )}
 
-      <div className="flex gap-3">
-        {rulesSlide === 1 ? (
-          <>
-            <button type="button" onClick={() => goBack(2)} className="btn-secondary w-auto px-5">← Tilbake</button>
-            <button type="button" onClick={() => setRulesSlide(2)} className="btn-primary">Neste →</button>
-          </>
-        ) : (
-          <>
-            <button type="button" onClick={() => setRulesSlide(1)} className="btn-secondary w-auto px-5">← Tilbake</button>
-            <button type="button" onClick={handleComplete} disabled={submitting} className="btn-primary">
-              {submitting ? 'Starter…' : 'Start spillet! 🚀'}
-            </button>
-          </>
-        )}
-      </div>
+      <HowToPlayContent
+        onDone={handleComplete}
+        doneLabel={submitting ? 'Starter…' : 'Start spillet! 🚀'}
+        disabled={submitting}
+      />
     </motion.div>
   )
 
