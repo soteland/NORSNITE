@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { supabase } from '@/lib/supabase/client'
 import { AuthCard } from '@/components/layout/AuthCard'
 import { TurnstileWidget } from '@/components/ui/TurnstileWidget'
@@ -18,7 +18,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export default function SignupPage() {
-  const navigate = useNavigate()
+  const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [turnstileOk, setTurnstileOk] = useState(false)
   const turnstileTokenRef = useRef<string | null>(null)
@@ -40,8 +40,30 @@ export default function SignupPage() {
         ? 'Denne e-posten er allerede registrert. Prøv å logge inn.'
         : 'Noe gikk galt. Prøv igjen!')
     } else {
-      navigate({ to: '/velkommen' })
+      setSent(true)
     }
+  }
+
+  if (sent) {
+    return (
+      <AuthCard title="Sjekk e-posten din 📬">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <p className="text-5xl">✉️</p>
+          <p className="text-white font-bold text-lg">Konto opprettet!</p>
+          <p className="text-[var(--muted)] text-sm leading-relaxed">
+                    Vi har sendt en e-post til deg. <br></br>
+                    Åpne e-posten og trykk på lenken for å aktivere kontoen din.
+                </p>
+                <p>Spør gjerne en voksen om hjelp!</p>
+          <p className="text-[var(--muted)] text-sm mt-2">
+            Ikke fått e-post? Sjekk søppelpost-mappen.
+          </p>
+        </div>
+        <Link to="/logg-inn" className="btn-primary block text-center mt-6">
+          Gå til innlogging
+        </Link>
+      </AuthCard>
+    )
   }
 
   return (

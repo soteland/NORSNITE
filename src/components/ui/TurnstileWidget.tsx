@@ -37,8 +37,9 @@ export function TurnstileWidget({ onSuccess, onExpire }: TurnstileWidgetProps) {
     }
 
     const interval = setInterval(() => {
-      if (containerRef.current && window.turnstile && !widgetIdRef.current) {
-        widgetIdRef.current = window.turnstile.render(containerRef.current, {
+      const container = containerRef.current
+      if (container && window.turnstile && !widgetIdRef.current && container.childElementCount === 0) {
+        widgetIdRef.current = window.turnstile.render(container, {
           sitekey: SITE_KEY,
           theme: 'dark',
           callback: onSuccess,
@@ -48,10 +49,7 @@ export function TurnstileWidget({ onSuccess, onExpire }: TurnstileWidgetProps) {
       }
     }, 100)
 
-    return () => {
-      clearInterval(interval)
-      widgetIdRef.current = null
-    }
+    return () => clearInterval(interval)
   }, [onSuccess, onExpire])
 
   if (!SITE_KEY) return null
