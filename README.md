@@ -1,5 +1,11 @@
 # NorsNite 🎮📖
 
+INSERT IMAGE LOGO FREM REPO
+
+![Screenshot](public/images/norsnite-logo.png)
+ 
+Spill her: [Norsnite.Soteland.no](https://norsnite.soteland.no/) *(Åpent for alle!)*
+
 Et Fortnite-inspirert norsk lesespill for barn 7–12 år. Målet er at barn skal **ha lyst til** å øve på lesing ved å pakke det inn i en engasjerende og visuelt spennende spillopplevelse.
 
 *Hva gjør en pappa som kan kode, men som ikke er så flink lærer? Dette!*
@@ -100,4 +106,4 @@ Bronse → Sølv → Gull → Platina → Diamant → Elite → Champion → Ure
 
 ---
 
-*Laget med kjærlighet — og litt for mye kaffe — for å gjøre norsklesing gøy.*
+*Laget med kjærlighet — og AI — og litt for mye kaffe — for å gjøre norsklesing gøy.*
