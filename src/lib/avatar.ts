@@ -39,6 +39,19 @@ export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
   glasses: null,
 }
 
+function pick<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)] }
+
+export function randomAvatarConfig(): AvatarConfig {
+  const allColors = [...SKIN_TONES, ...FUN_COLORS]
+  return {
+    backgroundColor: pick(allColors).hex,
+    eyes:     pick(EYES),
+    eyebrows: pick(EYEBROWS),
+    mouth:    pick(MOUTH),
+    glasses:  Math.random() < 0.25 ? pick(GLASSES.filter(g => g !== null) as string[]) : null,
+  }
+}
+
 export function cycleOption<T>(arr: T[], current: T, delta: number): T {
   const idx = arr.indexOf(current)
   return arr[((idx + delta) % arr.length + arr.length) % arr.length]
