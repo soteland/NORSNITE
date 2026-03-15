@@ -8,7 +8,7 @@ Et Fortnite-inspirert norsk lesespill for barn 7–12 år. Målet er at barn ska
 
 *Hva gjør en pappa som kan kode, men som ikke er så flink lærer? Dette!*
 
-> **Språk: Kun norsk.** Spillet er bygget for norsktalende barn og jeg har ingen umiddelbare planer om å oversette det. All UI-tekst, instruksjoner, spørsmål og tilbakemeldinger er på norsk.
+> **Språk: Kun norsk.** Spillet er bygget for å lære norsk og jeg har ingen umiddelbare planer om å oversette det. All UI-tekst, instruksjoner, spørsmål og tilbakemeldinger er på norsk.
 
 ---
 
