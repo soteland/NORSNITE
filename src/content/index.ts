@@ -6,6 +6,7 @@ import { comprehensionQuestions } from './comprehension'
 import { punctuationQuestions } from './punctuation'
 import { synonymQuestions, getSynonymForDifficulty } from './synonyms'
 import { antonymQuestions, getAntonymForDifficulty } from './antonyms'
+import { rhymeQuestions, getRhymeForDifficulty } from './rhymes'
 import type {
   Question,
   Word,
@@ -18,6 +19,7 @@ import type {
   PunctuationQuestion,
   SynonymQuestion,
   AntonymQuestion,
+  RhymeQuestion,
   QuestionType,
 } from './types'
 
@@ -32,6 +34,7 @@ export type {
   PunctuationQuestion,
   SynonymQuestion,
   AntonymQuestion,
+  RhymeQuestion,
 }
 export { words, getWordsByCategory, getWordsForDifficulty }
 export { spellWords, getSpellWordsForDifficulty }
@@ -41,6 +44,7 @@ export { comprehensionQuestions }
 export { punctuationQuestions }
 export { synonymQuestions, getSynonymForDifficulty }
 export { antonymQuestions, getAntonymForDifficulty }
+export { rhymeQuestions, getRhymeForDifficulty }
 
 // Fisher-Yates shuffle
 export function shuffleArray<T>(arr: T[]): T[] {
@@ -139,6 +143,7 @@ export function pickRandomQuestion(
     'punctuation',
     'synonym',
     'antonym',
+    'rhyme',
     // comprehension kept for longer sessions; add to preferredTypes if needed
   ]
   const type = types[Math.floor(Math.random() * types.length)]
@@ -194,6 +199,12 @@ export function pickRandomQuestion(
 
   if (type === 'antonym') {
     const pool = getAntonymForDifficulty(difficulty).filter(q => !excludeIds.includes(q.id))
+    if (!pool.length) return null
+    return pool[Math.floor(Math.random() * pool.length)]
+  }
+
+  if (type === 'rhyme') {
+    const pool = getRhymeForDifficulty(difficulty).filter(q => !excludeIds.includes(q.id))
     if (!pool.length) return null
     return pool[Math.floor(Math.random() * pool.length)]
   }

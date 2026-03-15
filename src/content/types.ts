@@ -8,6 +8,7 @@ export type QuestionType =
   | 'punctuation'
   | 'synonym'
   | 'antonym'
+  | 'rhyme'
 
 export interface Word {
   id: string
@@ -104,6 +105,16 @@ export interface AntonymQuestion {
   choices: string[]  // includes correct; shuffle at runtime
 }
 
+// Choose the word that rhymes with the given word
+export interface RhymeQuestion {
+  type: 'rhyme'
+  id: string
+  difficulty: number
+  word: string       // the word to find a rhyme for
+  correct: string    // the correct rhyme
+  choices: string[]  // includes correct; shuffle at runtime
+}
+
 export type Question =
   | WordToImageQuestion
   | ImageToWordQuestion
@@ -114,3 +125,4 @@ export type Question =
   | PunctuationQuestion
   | SynonymQuestion
   | AntonymQuestion
+  | RhymeQuestion

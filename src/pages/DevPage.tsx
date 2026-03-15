@@ -14,6 +14,7 @@ import {
   buildSpellIt,
   getSynonymForDifficulty,
   getAntonymForDifficulty,
+  getRhymeForDifficulty,
 } from '@/content'
 import type { Question, QuestionType } from '@/content/types'
 import QuestionCard from '@/components/game/QuestionCard'
@@ -35,6 +36,7 @@ const TYPES: { type: QuestionType; label: string }[] = [
   { type: 'spell_it',      label: 'Skriv ordet' },
   { type: 'synonym',       label: 'Synonym' },
   { type: 'antonym',       label: 'Motsetning' },
+  { type: 'rhyme',         label: 'Riming' },
 ]
 
 function buildQuestion(type: QuestionType, difficulty: number): Question | null {
@@ -72,6 +74,11 @@ function buildQuestion(type: QuestionType, difficulty: number): Question | null 
   }
   if (type === 'antonym') {
     const pool = getAntonymForDifficulty(difficulty)
+    if (!pool.length) return null
+    return pool[Math.floor(Math.random() * pool.length)]
+  }
+  if (type === 'rhyme') {
+    const pool = getRhymeForDifficulty(difficulty)
     if (!pool.length) return null
     return pool[Math.floor(Math.random() * pool.length)]
   }

@@ -4,7 +4,7 @@ Et Fortnite-inspirert norsk lesespill for barn 7–12 år. Målet er at barn ska
 
 *Hva gjør en pappa som kan kode, men som ikke er så flink lærer? Dette!*
 
-> **Språk: Kun norsk.** Spillet er bygget for norsktalende barn og jeg har ingen umiddelbare planer om å oversette det. All UI-tekst, instruksjoner, spørsmål og tilbakemeldinger er på norsk. Ingen i18n, ingen lokaliseringslag.
+> **Språk: Kun norsk.** Spillet er bygget for norsktalende barn og jeg har ingen umiddelbare planer om å oversette det. All UI-tekst, instruksjoner, spørsmål og tilbakemeldinger er på norsk.
 
 ---
 
@@ -12,8 +12,8 @@ Et Fortnite-inspirert norsk lesespill for barn 7–12 år. Målet er at barn ska
 
 - **Norsk lesetrening** — ikke fremmedspråklæring, men flyt og forståelse for morsmålsbrukere
 - **Web app** som fungerer bra i Safari på iPad og iPhone
-- **TBD: Innlogging** via Google (gmail.com) eller Microsoft (outlook.com) — ingen passord å huske
-- **Venner-system** — se dine venners liga-nivå og XP
+- **Innlogging** med e-post og passord — enkel kontooppretting med e-postverifisering
+- **Venner-system** — søk opp venner, se deres liga-nivå, XP og merker på profilsiden deres
 - **Solo spill-loop** — fullfør runder med minispill, tjen XP, klatre i ligaer, lås opp kosmetikk
 
 ---
@@ -28,10 +28,9 @@ Et Fortnite-inspirert norsk lesespill for barn 7–12 år. Målet er at barn ska
 | 4 | **Skriv ordet** | Hør/se et ord — skriv det selv (med ÆØÅ-knapper) | Gull |
 | 5 | **Ordrekkefølge** | Bygg en setning fra stokket om ord-brikker | Platina |
 | 6 | **Les og forstå** | Les et avsnitt → «Hva handlet dette om?» — velg 1 av 3 | Diamant |
-
-**Bilder og emojis:**
-- Alle minispill bruker **emojis** (Unicode) — definert i kode, tekst↔bilde alltid korrekt, ingen filer, fungerer perfekt på iOS
-- Bakgrunner og avatar-kosmetikk bruker **CSS gradients + SVG** — ingen bildefiler, rask på mobil
+| 7 | **Riming** | Velg hvilket ord som rimer med det gitte ordet | Sølv |
+| 8 | **Synonym** | Velg ordet som betyr det samme | Gull |
+| 9 | **Antonym** | Velg ordet som betyr det motsatte | Sølv |
 
 Vanskelighetsgrad justeres automatisk: korte, enkle ord tidlig → lengre ord + komplekse setninger på høyere nivåer.
 
@@ -40,96 +39,65 @@ Vanskelighetsgrad justeres automatisk: korte, enkle ord tidlig → lengre ord + 
 ## XP- og Liga-system (Fortnite-stil)
 
 ```
-Bronze → Silver → Gold → Platinum → Diamond → Elite → Champion → Unreal
+Bronse → Sølv → Gull → Platina → Diamant → Elite → Champion → Ureal
 ```
 
 - Hver riktig svar gir XP (justert etter vanskelighetsgrad og minispilltype)
-- **Victory Royale** skjerm ved rundegevinst
-- **Kroneseier** — 10% sjanse ved rundestart til å spille med krone; du må få **alle svarene riktige** (perfekt runde) for å tjene +50% XP-bonus. Ingen straff for en ikke-perfekt kronerunde. Ingen begrensning på kroneseire — antall vises på profil (👑 ×12)
+- **Victory Royale**-skjerm ved rundegevinst
+- **Kroneseier** — 10% sjanse ved rundestart til å spille med krone; du må få **alle svarene riktige** (perfekt runde) for å tjene +50% XP-bonus. Antall kroneseire vises på profil (👑 ×12)
+- **Prestasjonsbadger** — låses opp ved milepæler (første riktige svar, streaker, kroneseire, og mer)
 - Liga-badge vist på avatar og venneliste
 
 ---
 
-## Kosmetikk (Låsbare elementer)
+## Kosmetikk og Avatar
 
-- **Kostymer** for 2D-avatar (låses opp på milepælsnivåer)
-- **Bakgrunner** for spillskjermen (låses opp ved ligapromoteringer)
-- Mer kan legges til ved å redigere innholdsfilene i koden — ingen admin-panel nødvendig
+- **Tilpassbar 2D-avatar** bygget med DiceBear — velg øyne, øyenbryn, munn, briller og bakgrunnsfarge
+- **Tilfeldig avatar** genereres automatisk ved kontooppretting — juster den selv etterpå
+- Hudtoner og morsomme farger (lilla, blå, grønn, oransje, rosa, cyan, gul, rød)
+- **Loot box**-system med fire rariteter:
+  - 🟫 **Vanlig** — +25 XP
+  - 🟦 **Sjelden** — XP, hopp-token eller skjold
+  - 🟪 **Episk** — større XP, token eller lengre skjold
+  - 🟡 **Legendarisk** — stor XP, token eller flerdagers skjold
 
 ---
 
-## Innhold
+## Sikkerhet
 
-Alle spørsmål/ord/setninger ligger i `/src/content/` som TypeScript-filer.  
-Legge til nytt innhold = redigere disse filene og distribuere. Ingen CMS eller admin-grensesnitt nødvendig.
+- **Cloudflare Turnstile** CAPTCHA på kontooppretting — beskytter mot bot-registrering
+- **E-postverifisering** — kontoen aktiveres ikke før e-posten er bekreftet
+- **Slett konto** — krever at brukeren skriver inn brukernavnet sitt for å bekrefte. Slettes permanent via Supabase Edge Function med service-role nøkkel
+- Row Level Security (RLS) på alle Supabase-tabeller
+
+---
+
+## Venner
+
+- Søk opp venner på brukernavn
+- Se vennens profil: avatar, liga, XP, statistikk og prestasjonsbadger
+- Fjern venner med bekreftelsesdialog
 
 ---
 
 ## Teknologi-stack
 
-| Lag | Valg | Årsak |
-|-------|--------|--------|
-| Frontend rammeverk | **React + TypeScript** | Kjent for utvikler, stort økosystem |
-| Byggverktøy | **Vite** | Rask, enkel Cloudflare-distribusjon |
-| Ruting | **TanStack Router** | Type-sikker, integrert med TanStack Query |
-| Serverstatus | **TanStack Query** | Hurtigbuffer, lastetilstander, Supabase-integrasjon |
-| Klientstatus | **Zustand** | Spilltilstand, aktiv runde, krone-status |
-| Skjemaer | **React Hook Form + Zod** | Validering av brukernavn-endring m.m. |
-| UI-komponenter | **shadcn/ui + Tailwind CSS** | Full kontroll, copy-paste komponenter |
-| Animasjoner | **Framer Motion** | Victory Royale, XP-bar, liga promoteringer |
-| Database + Auth | **Supabase** | Postgres, RLS, Google + Microsoft OAuth |
-| Hosting | **Cloudflare Pages** | Gratis, rask, kobler til GitHub |
+| Lag | Valg |
+|-----|------|
+| Frontend | **React 18 + TypeScript** |
+| Byggverktøy | **Vite** |
+| Ruting | **TanStack Router** (type-sikker filbasert ruting) |
+| Serverstatus | **TanStack Query** (hurtigbuffer + Supabase-integrasjon) |
+| Klientstatus | **Zustand** (spilltilstand, aktiv runde, krone-status) |
+| Skjemaer | **React Hook Form + Zod** |
+| Styling | **Tailwind CSS + shadcn/ui** |
+| Animasjoner | **Framer Motion** (Victory Royale, XP-bar, ligapromotering) |
+| Avatar | **DiceBear** (Open Peeps-stil, SVG, ingen bildefiler) |
+| Database + Auth | **Supabase** (Postgres, RLS, Edge Functions) |
+| CAPTCHA | **Cloudflare Turnstile** |
+| Hosting | **GitHub Pages** (gratis, kobler til GitHub Actions) |
+| Keep-alive | **GitHub Actions** (ukentlig Supabase-ping) |
 
 ---
 
-## Prosjektstruktur (planlagt)
-
-```
-norsGame/
-├── src/
-│   ├── routes/
-│   │   ├── index.tsx             ← Hjem / lobby
-│   │   ├── game/index.tsx        ← Aktiv spillrunde
-│   │   ├── profile/index.tsx     ← Avatar, XP, merker
-│   │   ├── friends/index.tsx     ← Venner liste + liga rangeringer
-│   │   └── admin/index.tsx       ← Admin panel (eier kun)
-│   ├── content/
-│   │   ├── words.ts              ← ordliste (240+ ord, 12 kategorier)
-│   │   ├── sentences.ts          ← fyll-inn og ord-rekkefølge setninger
-│   │   └── comprehension.ts      ← les-og-forstå avsnitt
-│   ├── lib/
-│   │   ├── xp.ts                 ← XP/liga beregninger
-│   │   ├── minigames/            ← En fil per minispilltype
-│   │   ├── avatar.ts             ← Kosmetisk opplåsingslogikk
-│   │   ├── username/             ← Norske ordlister for brukernavn-generering
-│   │   └── supabase.ts           ← Supabase-klient
-│   └── store/
-│       └── game.ts               ← Zustand: aktiv runde, krone, comeback bonus
-├── supabase/
-│   └── migrations/               ← DB-skjema (kjør mot dev + prod)
-├── .github/
-│   └── workflows/
-│       └── keep-alive.yml        ← Ukentlig Supabase ping
-├── public/
-│   └── splash/                   ← Månedlige splash-bilder (january.webp, osv.)
-├── README.md
-└── PLAN.md
-```
-
----
-
-## Komme i gang (utvikling)
-
-```bash
-cd norsGame
-npm create vite@latest . -- --template react-ts
-npm install
-npm run dev
-```
-
-Supabase prosjekt-URL og anon-nøkkel går i `.env.local`:
-```
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_ANON_KEY=...
-VITE_ADMIN_USER_ID=...
-```
+*Laget med kjærlighet — og litt for mye kaffe — for å gjøre norsklesing gøy.*

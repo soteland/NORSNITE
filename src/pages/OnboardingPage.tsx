@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth/AuthContext'
 import {
   EYES, EYEBROWS, MOUTH, GLASSES,
   SKIN_TONES, FUN_COLORS,
-  DEFAULT_AVATAR_CONFIG, cycleOption,
+  randomAvatarConfig, cycleOption,
   type AvatarConfig,
 } from '@/lib/avatar'
 import AvatarPreview from '@/components/AvatarPreview'
@@ -68,7 +68,7 @@ export default function OnboardingPage() {
   const [isCheckingUsername, setIsCheckingUsername] = useState(false)
 
   // Avatar state
-  const [avatarConfig, setAvatarConfig] = useState<AvatarConfig>(DEFAULT_AVATAR_CONFIG)
+  const [avatarConfig, setAvatarConfig] = useState<AvatarConfig>(randomAvatarConfig)
 
   const [submitting, setSubmitting] = useState(false)
 
