@@ -5,7 +5,7 @@ interface TurnstileWidgetProps {
   onExpire?: () => void
 }
 
-const SITE_KEY: string | undefined = import.meta.env.VITE_TURNSTILE_SITE_KEY
+const SITE_KEY: string | undefined = import.meta.env.VITE_TURNSTILE_SITE_KEY || undefined
 
 declare global {
   interface Window {
@@ -20,14 +20,13 @@ export function TurnstileWidget({ onSuccess, onExpire }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
 
-  // No site key configured — bypass silently (e.g. local dev)
   useEffect(() => {
-    if (!SITE_KEY) { onSuccess('no-sitekey-bypass'); return }
-  }, [])
+    // No site key — bypass silently (local dev without key configured)
+    if (!SITE_KEY) {
+      onSuccess('no-sitekey-bypass')
+      return
+    }
 
-  useEffect(() => {
-    if (!SITE_KEY) return
-    // Load Turnstile script if not already loaded
     if (!document.getElementById('cf-turnstile-script')) {
       const script = document.createElement('script')
       script.id = 'cf-turnstile-script'
@@ -37,7 +36,7 @@ export function TurnstileWidget({ onSuccess, onExpire }: TurnstileWidgetProps) {
       document.head.appendChild(script)
     }
 
-    const render = () => {
+    const interval = setInterval(() => {
       if (containerRef.current && window.turnstile && !widgetIdRef.current) {
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: SITE_KEY,
@@ -45,13 +44,6 @@ export function TurnstileWidget({ onSuccess, onExpire }: TurnstileWidgetProps) {
           callback: onSuccess,
           'expired-callback': onExpire,
         })
-      }
-    }
-
-    // Wait for script to load
-    const interval = setInterval(() => {
-      if (window.turnstile) {
-        render()
         clearInterval(interval)
       }
     }, 100)

@@ -4,8 +4,11 @@ const SPEECH_KEY = 'norsnite-mute-speech'
 const SFX_KEY    = 'norsnite-mute-sfx'
 
 export function useMute() {
-  const [speechMuted, setSpeechMuted] = useState(() => localStorage.getItem(SPEECH_KEY) === 'true')
-  const [sfxMuted,    setSfxMuted]    = useState(() => localStorage.getItem(SFX_KEY) === 'true')
+  const [speechMuted, setSpeechMuted] = useState(() => {
+    const v = localStorage.getItem(SPEECH_KEY)
+    return v !== null ? v === 'true' : true  // default: speech OFF
+  })
+  const [sfxMuted, setSfxMuted] = useState(() => localStorage.getItem(SFX_KEY) === 'true')
 
   useEffect(() => { localStorage.setItem(SPEECH_KEY, String(speechMuted)) }, [speechMuted])
   useEffect(() => { localStorage.setItem(SFX_KEY,    String(sfxMuted))    }, [sfxMuted])
@@ -22,7 +25,8 @@ export function useMute() {
 
 /** Called directly by speech.ts — no React needed */
 export function isSpeechMuted(): boolean {
-  return localStorage.getItem(SPEECH_KEY) === 'true'
+  const v = localStorage.getItem(SPEECH_KEY)
+  return v !== null ? v === 'true' : true  // default: speech OFF
 }
 
 export function isSfxMuted(): boolean {
