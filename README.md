@@ -1,7 +1,5 @@
 # NorsNite 🎮📖
 
-INSERT IMAGE LOGO FREM REPO
-
 ![Screenshot](public/images/norsnite-logo.png)
  
 Spill her: [Norsnite.Soteland.no](https://norsnite.soteland.no/) *(Åpent for alle!)*
