@@ -13,6 +13,8 @@ import {
 import AvatarPreview from '@/components/AvatarPreview'
 import { HowToPlayContent } from '@/components/layout/HowToPlaySheet'
 
+import norsniteLogo from '/images/norsnite-logo.png'
+
 // ── PascalCase username validation ────────────────────────────────────────────
 const PASCAL_RE = /^[A-ZÆØÅ][a-zA-ZæøåÆØÅ0-9]{2,19}$/
 
@@ -332,10 +334,12 @@ export default function OnboardingPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-black tracking-tight text-white">
-            Nors<span style={{ color: 'var(--accent)' }}>Nite</span>
+                  <h1 className="text-4xl font-black tracking-tight text-white">
+                      
+                      <img src={norsniteLogo} alt="NORSNITE" className="w-64 mx-auto" />
+            
           </h1>
-          <p className="text-[var(--muted)] text-sm mt-1">Les. Vinn. Klatr.</p>
+          <p className="text-[var(--muted)] text-sm mt-1">Les. Vinn. Klatre.</p>
         </div>
 
         {/* Step indicator */}

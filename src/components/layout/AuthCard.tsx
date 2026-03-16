@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import norsniteLogo from '/images/norsnite-logo.png'
 
 interface AuthCardProps {
   title: string
@@ -12,10 +13,12 @@ export function AuthCard({ title, children }: AuthCardProps) {
       <div className="w-full max-w-sm">
         {/* Logo / title */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-black tracking-tight text-white">
-            Nors<span style={{ color: 'var(--accent)' }}>Nite</span>
+                  <h1 className="text-4xl font-black tracking-tight text-white">
+                      
+                      <img src={norsniteLogo} alt="NORSNITE" className="w-96 mx-auto" />
+            
           </h1>
-          <p className="text-[var(--muted)] text-sm mt-1">Les. Vinn. Klatr.</p>
+          <p className="text-[var(--muted)] text-sm mt-1">Les. Vinn. Klatre.</p>
         </div>
 
         <div className="rounded-2xl border border-[var(--border)] p-6"
