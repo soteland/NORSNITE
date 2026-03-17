@@ -50,7 +50,7 @@ export const wordOrderQuestions: WordOrderQuestion[] = [
     type: 'word_order',
     id: 'wo-008',
     difficulty: 2,
-    correct: ['Bilen', 'er', 'rød', 'og', 'stor'],
+    correct: ['Bilen', 'er', 'rød', 'med', 'fartsstriper'],
   },
 
   // ── Difficulty 3 ──────────────────────────────────────────────
@@ -58,7 +58,7 @@ export const wordOrderQuestions: WordOrderQuestion[] = [
     type: 'word_order',
     id: 'wo-009',
     difficulty: 3,
-    correct: ['Vi', 'spiser', 'middag', 'nå'],
+    correct: ['Vi', 'spiser', 'middag', 'nå.'],
   },
   {
     type: 'word_order',
@@ -97,7 +97,6 @@ export const wordOrderQuestions: WordOrderQuestion[] = [
     id: 'wo-015',
     difficulty: 4,
     correct: ['Hunden', 'liker', 'å', 'ligge', 'på', 'sofaen'],
-    // Note: simpler version without 'å'
   },
   {
     type: 'word_order',
@@ -570,6 +569,270 @@ export const wordOrderQuestions: WordOrderQuestion[] = [
     id: 'wo-088',
     difficulty: 5,
     correct: ['Vask', 'hendene', 'før', 'du', 'spiser'],
+  },
+
+  // ── User-provided sentences ────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-089',
+    difficulty: 1,
+    correct: ['Fotball', 'er', 'gøy.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-090',
+    difficulty: 1,
+    correct: ['Tennis', 'er', 'gøy.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-091',
+    difficulty: 2,
+    correct: ['Det', 'treet', 'er', 'høyt.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-092',
+    difficulty: 3,
+    correct: ['Hvordan', 'går', 'det?'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-093',
+    difficulty: 4,
+    correct: ['Nummeret', 'til', 'politiet', 'er', '112.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-094',
+    difficulty: 4,
+    correct: ['Nummeret', 'til', 'brannvesenet', 'er', '113.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-095',
+    difficulty: 4,
+    correct: ['Gå', 'av', 'sykkelen', 'før', 'fotgjengerfeltet.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-096',
+    difficulty: 5,
+    correct: ['Ei', 'grein', 'på', 'treet', 'falt', 'ned.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-097',
+    difficulty: 6,
+    correct: ['Man', 'sykler', 'på', 'høyre', 'side', 'av', 'veien.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-098',
+    difficulty: 7,
+    correct: ['Lego', 'kan', 'bygges', 'på', 'nytt', 'mange', 'ganger.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-099',
+    difficulty: 8,
+    correct: ['Se', 'alltid', 'begge', 'veier', 'før', 'du', 'krysser', 'fotgjengerfeltet.'],
+  },
+
+  // ── Difficulty 1 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-100',
+    difficulty: 1,
+    correct: ['Hesten', 'er', 'brun.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-101',
+    difficulty: 1,
+    correct: ['Snøen', 'er', 'hvit.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-102',
+    difficulty: 1,
+    correct: ['Gresset', 'er', 'grønt.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-103',
+    difficulty: 1,
+    correct: ['Sola', 'skinner.'],
+  },
+
+  // ── Difficulty 2 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-104',
+    difficulty: 2,
+    correct: ['Katten', 'sover', 'mye.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-105',
+    difficulty: 2,
+    correct: ['Fisken', 'er', 'rå.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-106',
+    difficulty: 2,
+    correct: ['Nøkkelen', 'er', 'liten.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-107',
+    difficulty: 2,
+    correct: ['Bamsen', 'er', 'myk.'],
+  },
+
+  // ── Difficulty 3 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-108',
+    difficulty: 3,
+    correct: ['Barnet', 'sover', 'i', 'senga.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-109',
+    difficulty: 3,
+    correct: ['Vi', 'går', 'til', 'parken.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-110',
+    difficulty: 3,
+    correct: ['Han', 'spiser', 'et', 'eple.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-111',
+    difficulty: 3,
+    correct: ['Katten', 'leker', 'med', 'ballen.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-112',
+    difficulty: 3,
+    correct: ['Det', 'regner', 'ute', 'i', 'dag.'],
+  },
+
+  // ── Difficulty 4 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-113',
+    difficulty: 4,
+    correct: ['Jenta', 'tegner', 'et', 'hus.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-114',
+    difficulty: 4,
+    correct: ['Vi', 'bor', 'nær', 'skolen.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-115',
+    difficulty: 4,
+    correct: ['Hunden', 'venter', 'ved', 'døra.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-116',
+    difficulty: 4,
+    correct: ['Mamma', 'lager', 'mat', 'til', 'oss.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-117',
+    difficulty: 4,
+    correct: ['Papa', 'leser', 'avisen', 'sin.'],
+  },
+
+  // ── Difficulty 5 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-118',
+    difficulty: 5,
+    correct: ['Det', 'er', 'kaldt', 'om', 'vinteren.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-119',
+    difficulty: 5,
+    correct: ['Vi', 'spiser', 'frokost', 'hver', 'morgen.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-120',
+    difficulty: 5,
+    correct: ['Jeg', 'liker', 'å', 'spille', 'spill.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-121',
+    difficulty: 5,
+    correct: ['Hunden', 'ble', 'funnet', 'ved', 'elva.'],
+  },
+
+  // ── Difficulty 6 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-122',
+    difficulty: 6,
+    correct: ['Katten', 'gjemte', 'seg', 'under', 'bordet.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-123',
+    difficulty: 6,
+    correct: ['Vi', 'spiser', 'middag', 'klokka', 'fem.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-124',
+    difficulty: 6,
+    correct: ['Barna', 'synger', 'en', 'sang', 'på', 'skolen.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-125',
+    difficulty: 6,
+    correct: ['Han', 'kom', 'for', 'sent', 'til', 'toget.'],
+  },
+
+  // ── Difficulty 7 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-126',
+    difficulty: 7,
+    correct: ['Det', 'er', 'viktig', 'å', 'sove', 'nok.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-127',
+    difficulty: 7,
+    correct: ['Hun', 'smiler', 'fordi', 'hun', 'er', 'glad.'],
+  },
+
+  // ── Difficulty 8 ──────────────────────────────────────────────
+  {
+    type: 'word_order',
+    id: 'wo-128',
+    difficulty: 8,
+    correct: ['Legen', 'sa', 'at', 'han', 'måtte', 'hvile', 'seg.'],
+  },
+  {
+    type: 'word_order',
+    id: 'wo-129',
+    difficulty: 8,
+    correct: ['Klassen', 'jobbet', 'hardt', 'for', 'å', 'lære', 'tabellene.'],
   },
 ]
 
