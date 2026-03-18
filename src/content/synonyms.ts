@@ -74,7 +74,7 @@ export const synonymQuestions: SynonymQuestion[] = [
   { type: 'synonym', id: 'syn-057', difficulty: 6, word: 'forandre', correct: 'endre',        choices: ['endre', 'beholde', 'stoppe', 'skape'] },
   { type: 'synonym', id: 'syn-058', difficulty: 6, word: 'viktig',   correct: 'vesentlig',     choices: ['vesentlig', 'uviktig', 'liten', 'ubetydelig'] },
   { type: 'synonym', id: 'syn-059', difficulty: 6, word: 'undersøke',correct: 'granske',      choices: ['granske', 'ignorere', 'leve', 'bære'] },
-  { type: 'synonym', id: 'syn-060', difficulty: 6, word: 'oppleve',  correct: 'erfare',       choices: ['erfare', 'se', 'miste', 'gi'] },
+  { type: 'synonym', id: 'syn-060', difficulty: 6, word: 'oppleve',  correct: 'erfare',       choices: ['erfare', 'løpe', 'miste', 'gi'] },
   // Level 7 (4 choices each)
   { type: 'synonym', id: 'syn-061', difficulty: 7, word: 'ærlig',     correct: 'oppriktig',     choices: ['oppriktig', 'løgnaktig', 'falsk', 'skjult'] },
   { type: 'synonym', id: 'syn-062', difficulty: 7, word: 'forsiktig', correct: 'varsom',        choices: ['varsom', 'uaktsom', 'voldsom', 'vill'] },

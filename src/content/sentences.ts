@@ -55,7 +55,7 @@ export const sentences: SentenceData[] = [
   { id: 'fi-039', difficulty: 4, sentence: 'Læreren ba oss om å sitte ___.',  correct: 'stille', choices: ['stille', 'fort', 'høyt', 'utendørs'] },
   { id: 'fi-040', difficulty: 4, sentence: 'Jenta var så glad at hun måtte ___.',  correct: 'smile', choices: ['smile', 'jorda', 'mange', 'rakett'] },
   { id: 'fi-041', difficulty: 4, sentence: 'Vi fisket hele dagen uten å få ___.',  correct: 'noe',  choices: ['noe', 'alt', 'ingenting', 'mer'] },
-  { id: 'fi-042', difficulty: 4, sentence: 'Helikopteret landet ___ gården.',  correct: 'ved', choices: ['ved', 'over', 'under', 'utenfor'] },
+  { id: 'fi-042', difficulty: 4, sentence: 'Helikopteret landet ___ gården.',  correct: 'ved', choices: ['ved', 'over', 'under', 'snurrende'] },
   { id: 'fi-043', difficulty: 4, sentence: 'Grantreet er alltid ___ om vinteren.',  correct: 'grønt', choices: ['grønt', 'rødt', 'blått', 'hvitt'] },
   { id: 'fi-044', difficulty: 4, sentence: 'Han spiste ___ av kaken sin.',  correct: 'resten', choices: ['resten', 'boken', 'turen', 'steinen'] },
 
