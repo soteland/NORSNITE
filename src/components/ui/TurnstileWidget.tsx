@@ -1,58 +1,16 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
 interface TurnstileWidgetProps {
   onSuccess: (token: string) => void
   onExpire?: () => void
 }
 
-const SITE_KEY: string | undefined = import.meta.env.VITE_TURNSTILE_SITE_KEY || undefined
-
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (el: HTMLElement, opts: object) => string
-      reset: (widgetId: string) => void
-    }
-  }
-}
-
-export function TurnstileWidget({ onSuccess, onExpire }: TurnstileWidgetProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const widgetIdRef = useRef<string | null>(null)
-
+// Turnstile is disabled. This stub auto-succeeds so auth forms work without CAPTCHA.
+// To re-enable, replace this file with the real implementation and set VITE_TURNSTILE_SITE_KEY.
+export function TurnstileWidget({ onSuccess }: TurnstileWidgetProps) {
   useEffect(() => {
-    // No site key — bypass silently (local dev without key configured)
-    if (!SITE_KEY) {
-      onSuccess('no-sitekey-bypass')
-      return
-    }
+    onSuccess('disabled')
+  }, [onSuccess])
 
-    if (!document.getElementById('cf-turnstile-script')) {
-      const script = document.createElement('script')
-      script.id = 'cf-turnstile-script'
-      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
-      script.async = true
-      script.defer = true
-      document.head.appendChild(script)
-    }
-
-    const interval = setInterval(() => {
-      const container = containerRef.current
-      if (container && window.turnstile && !widgetIdRef.current && container.childElementCount === 0) {
-        widgetIdRef.current = window.turnstile.render(container, {
-          sitekey: SITE_KEY,
-          theme: 'dark',
-          callback: onSuccess,
-          'expired-callback': onExpire,
-        })
-        clearInterval(interval)
-      }
-    }, 100)
-
-    return () => clearInterval(interval)
-  }, [onSuccess, onExpire])
-
-  if (!SITE_KEY) return null
-
-  return <div ref={containerRef} className="flex justify-center" />
+  return null
 }

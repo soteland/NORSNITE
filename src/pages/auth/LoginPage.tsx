@@ -26,10 +26,7 @@ export default function LoginPage() {
   const onSubmit = async (data: FormData) => {
     if (!turnstileOk) return
     setError(null)
-    const { error } = await supabase.auth.signInWithPassword({
-      ...data,
-      options: { captchaToken: turnstileTokenRef.current ?? undefined },
-    })
+    const { error } = await supabase.auth.signInWithPassword(data)
     if (error) {
       setError('Feil e-post eller passord. Prøv igjen!')
     } else {

@@ -30,11 +30,7 @@ export default function SignupPage() {
   const onSubmit = async ({ email, password }: FormData) => {
     if (!turnstileOk) return
     setError(null)
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { captchaToken: turnstileTokenRef.current ?? undefined },
-    })
+    const { error } = await supabase.auth.signUp({ email, password })
     if (error) {
       setError(error.message === 'User already registered'
         ? 'Denne e-posten er allerede registrert. Prøv å logge inn.'
