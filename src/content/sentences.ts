@@ -92,7 +92,7 @@ export const sentences: SentenceData[] = [
   { id: 'fi-070', difficulty: 7, sentence: 'Ullgenseren holdt meg ___ i kulden.',  correct: 'varm', choices: ['varm', 'kald', 'tørr', 'våt'] },
   { id: 'fi-071', difficulty: 7, sentence: 'Kontrabassen er det største ___ instrumentet.',  correct: 'strykeinstrumentet', choices: ['strykeinstrumentet', 'blåseinstrumentet', 'slagverket', 'trekkspillet'] },
   { id: 'fi-072', difficulty: 7, sentence: 'Friidrett ___ mange forskjellige øvelser.',  correct: 'inkluderer', choices: ['inkluderer', 'bruker', 'fjerner', 'lager'] },
-  { id: 'fi-073', difficulty: 7, sentence: 'Søppelkassen bør ___ for å beskytte miljøet.',  correct: 'sorteres', choices: ['sorteres', 'brennes', 'lukkes', 'åpnes'] },
+  { id: 'fi-073', difficulty: 7, sentence: 'Søppel bør ___ for å beskytte miljøet.',  correct: 'sorteres', choices: ['sorteres', 'brennes', 'lukkes', 'åpnes'] },
   { id: 'fi-074', difficulty: 7, sentence: 'En trombonist spiller ved å ___.',  correct: 'skyve et rør', choices: ['skyve et rør', 'blåse i et hull', 'trykke tangenter', 'stryke strenger'] },
   { id: 'fi-075', difficulty: 7, sentence: 'Nøkkelbenet er plassert mellom skulderen og ___.',  correct: 'brystbenet', choices: ['brystbenet', 'låret', 'albuen', 'kneet'] },
   { id: 'fi-076', difficulty: 7, sentence: 'Triatlon består av svømming, sykling og ___.',  correct: 'løping', choices: ['løping', 'hopping', 'kasting', 'klatring'] },

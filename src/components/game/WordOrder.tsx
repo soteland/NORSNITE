@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { WordOrderQuestion } from '@/content/types'
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -20,6 +20,12 @@ export default function WordOrder({ question, onAnswer, disabled }: Props) {
     const [placed, setPlaced] = useState<string[]>([])
     // Shuffle correct order at mount — preserves original casing
     const [remaining, setRemaining] = useState<string[]>(() => shuffleArray(question.correct))
+
+    // Reset state when a new question arrives (component is reused between WordOrder questions)
+    useEffect(() => {
+        setPlaced([])
+        setRemaining(shuffleArray(question.correct))
+    }, [question.correct.join(' ')])
 
     function placeTile(tile: string, idx: number) {
         setRemaining(r => r.filter((_, i) => i !== idx))
