@@ -16,6 +16,7 @@ import {
     getAntonymForDifficulty,
     getRhymeForDifficulty,
     getDoubleConsonantsForDifficulty,
+    getWordRecognitionsForDifficulty,
 } from '@/content'
 import type { Question, QuestionType } from '@/content/types'
 import QuestionCard from '@/components/game/QuestionCard'
@@ -39,6 +40,7 @@ const TYPES: { type: QuestionType; label: string }[] = [
     { type: 'antonym', label: 'Motsetning' },
     { type: 'rhyme', label: 'Riming' },
     { type: 'double_consonant', label: 'Dobbel konsonant' },
+    { type: 'word_recognition', label: 'Ordgjenkjenning' },
 ]
 
 function buildQuestion(type: QuestionType, difficulty: number): Question | null {
@@ -54,6 +56,11 @@ function buildQuestion(type: QuestionType, difficulty: number): Question | null 
     }
     if (type === 'double_consonant') {
         const pool = getDoubleConsonantsForDifficulty(difficulty)
+        if (!pool.length) return null
+        return pool[Math.floor(Math.random() * pool.length)]
+    }
+    if (type === 'word_recognition') {
+        const pool = getWordRecognitionsForDifficulty(difficulty)
         if (!pool.length) return null
         return pool[Math.floor(Math.random() * pool.length)]
     }

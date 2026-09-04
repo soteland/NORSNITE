@@ -61,6 +61,20 @@ export const ROUND_LENGTH: Record<League, number> = {
 export const BASE_XP = 5 // per correct answer
 
 /**
+ * A word_recognition answer at or under this many ms earns the fast-read bonus.
+ * Only that type is timed: automatic recognition IS the skill there, while
+ * answering spell_it or comprehension fast is not a goal.
+ */
+export const FAST_ANSWER_MS = 3000
+
+/**
+ * Flat XP per fast recognition answer. Unmultiplied, like skip XP, so it can't
+ * compound with perfect/crown/comeback and skew round balance. A fast answer is
+ * worth 7 XP instead of 5 — noticeable to a kid, invisible to the XP curve.
+ */
+export const FAST_BONUS_XP = 2
+
+/**
  * Base XP a full round is worth before bonuses — round length × BASE_XP.
  * Loot rewards are scaled off this so a chest stays a constant share of income
  * (~20%) at every league instead of being worth 2-3 Bronze rounds.
@@ -88,6 +102,7 @@ export function xpToNextLeague(totalXp: number): { league: League; remaining: nu
 export interface XpResult {
   baseXp: number
   skippedXp: number
+  fastXp: number
   multiplier: number  // e.g. 1.875 for perfect + crown + comeback
   totalXp: number
   isPerfect: boolean
@@ -101,22 +116,24 @@ export function calculateXp(opts: {
   usedSkip: boolean
   crownActive: boolean
   comebackBonus: boolean
+  fastAnswers?: number   // first-attempt word_recognition answers under FAST_ANSWER_MS
 }): XpResult {
-  const { correct, total, usedSkip, crownActive, comebackBonus } = opts
+  const { correct, total, usedSkip, crownActive, comebackBonus, fastAnswers = 0 } = opts
   const isPerfect = !usedSkip && correct === total && total > 0
   const isCrownWin = crownActive && isPerfect
 
   const baseXp = correct * BASE_XP
   const skippedXp = usedSkip ? BASE_XP : 0  // skip earns base XP, no multiplier
+  const fastXp = fastAnswers * FAST_BONUS_XP // flat, no multiplier
 
   let multiplier = 1
   if (isPerfect) multiplier *= 1.25
   if (isCrownWin) multiplier *= 1.50
   if (comebackBonus) multiplier *= 1.25
 
-  const totalXp = Math.round(baseXp * multiplier) + skippedXp
+  const totalXp = Math.round(baseXp * multiplier) + skippedXp + fastXp
 
-  return { baseXp, skippedXp, multiplier, totalXp, isPerfect, isCrownWin, isComeback: comebackBonus }
+  return { baseXp, skippedXp, fastXp, multiplier, totalXp, isPerfect, isCrownWin, isComeback: comebackBonus }
 }
 
 /**

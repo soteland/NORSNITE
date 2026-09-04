@@ -207,6 +207,9 @@ export default function RoundResult({
               <div className="mt-2 text-sm text-[var(--muted)] space-y-0.5">
                 <p>Base: {xpResult.baseXp} XP</p>
                 {xpResult.skippedXp > 0 && <p>Hopp-XP: +{xpResult.skippedXp}</p>}
+                {xpResult.fastXp > 0 && (
+                  <p className="text-yellow-300">⚡ Rask lesing: +{xpResult.fastXp} XP</p>
+                )}
                 {xpResult.multiplier > 1 && (
                   <p className="text-yellow-300">
                     Bonus ×{xpResult.multiplier.toFixed(2)}

@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/auth/AuthContext'
 import { useGameStore } from '@/lib/store/gameStore'
-import { calculateXp, rollCrown, rollComebackBonus } from '@/lib/xp'
+import { calculateXp, rollCrown, rollComebackBonus, FAST_ANSWER_MS } from '@/lib/xp'
 import { buildRound, getCorrectAnswerText } from '@/lib/roundController'
 import { speak, speakThen, playCorrect, playWrong, playRoundDone, playPerfect } from '@/lib/speech'
 import { useAchievements } from '@/hooks/useAchievements'
@@ -45,11 +45,16 @@ export default function GamePage() {
   const [teachingNote, setTeachingNote] = useState<string | null>(null)
   const [hintVisible, setHintVisible] = useState(false)
   const [comebackJustActivated, setComebackJustActivated] = useState(false)
+  // Fast-read bonus: counts first-attempt word_recognition answers under
+  // FAST_ANSWER_MS. wasFast only drives the ⚡ in the feedback banner.
+  const [fastCount, setFastCount] = useState(0)
+  const [wasFast, setWasFast] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [confirmSkip, setConfirmSkip] = useState(false)
 
   // Capture comebackBonus at round start so it doesn't change mid-round
   const comebackAtStart = useRef(false)
+  const questionShownAt = useRef(0)
 
   // ── Init round ────────────────────────────────────────────────────────────
   const initRound = useCallback(async () => {
@@ -58,6 +63,8 @@ export default function GamePage() {
     setQueue([])
     setQIndex(0)
     setCorrectCount(0)
+    setFastCount(0)
+    setWasFast(false)
     setUsedSkip(false)
     setAnswerStatus('idle')
     setTeachingNote(null)
@@ -94,8 +101,12 @@ export default function GamePage() {
 
   useEffect(() => { initRound() }, []) // run once on mount
 
+  // Start the fast-read clock each time a new question appears. Also fires when
+  // the round starts playing, so question 1 is timed from when it's visible.
+  useEffect(() => { questionShownAt.current = Date.now() }, [qIndex, phase])
+
   // ── End round ─────────────────────────────────────────────────────────────
-  const endRound = useCallback(async (finalCorrect: number, finalSkip: boolean, finalCrown: boolean, _finalQueue: Question[]) => {
+  const endRound = useCallback(async (finalCorrect: number, finalSkip: boolean, finalCrown: boolean, finalFast: number, _finalQueue: Question[]) => {
     if (!user || !profileBefore) return
 
     // originalCount is captured in closure via ref
@@ -105,6 +116,7 @@ export default function GamePage() {
       usedSkip: finalSkip,
       crownActive: finalCrown,
       comebackBonus: comebackAtStart.current,
+      fastAnswers: finalFast,
     })
 
     clearComeback()
@@ -171,14 +183,22 @@ export default function GamePage() {
     if (isCorrect) {
       // Only count first-attempt answers — retries (qIndex >= originalCount) don't qualify for perfect/XP count
       const isFirstAttempt = qIndex < originalCount
+      // Fast-read bonus is word_recognition only, and never on a retry — the
+      // kid has already been shown the answer by then.
+      const isFast = isFirstAttempt
+        && current.type === 'word_recognition'
+        && Date.now() - questionShownAt.current <= FAST_ANSWER_MS
       if (isFirstAttempt) setCorrectCount(c => c + 1)
+      if (isFast) setFastCount(c => c + 1)
+      setWasFast(isFast)
       setAnswerStatus('correct')
       playCorrect()
       speakThen('Riktig!', () => {
         // Don't reset to idle here — advanceQueue does it only for non-final questions
-        advanceQueue(qIndex + 1, queue, isFirstAttempt ? correctCount + 1 : correctCount, usedSkip, crownActive)
+        advanceQueue(qIndex + 1, queue, isFirstAttempt ? correctCount + 1 : correctCount, usedSkip, crownActive, isFast ? fastCount + 1 : fastCount)
       })
     } else {
+      setWasFast(false)
       setAnswerStatus('wrong')
       setHintVisible(false)
       playWrong()
@@ -198,7 +218,7 @@ export default function GamePage() {
           setAnswerStatus('idle')
           setTeachingNote(null)
           setHintVisible(false)
-          advanceQueue(qIndex + 1, newQueue, correctCount, usedSkip, crownActive)
+          advanceQueue(qIndex + 1, newQueue, correctCount, usedSkip, crownActive, fastCount)
         }, 2500)
       }, 1000)
     }
@@ -212,7 +232,7 @@ export default function GamePage() {
   function confirmAndSkip() {
     setConfirmSkip(false)
     setUsedSkip(true)
-    advanceQueue(qIndex + 1, queue, correctCount, true, crownActive)
+    advanceQueue(qIndex + 1, queue, correctCount, true, crownActive, fastCount)
   }
 
   function advanceQueue(
@@ -221,11 +241,12 @@ export default function GamePage() {
     currentCorrect: number,
     currentSkip: boolean,
     currentCrown: boolean,
+    currentFast: number,
   ) {
     if (nextIndex >= currentQueue.length) {
       // Lock buttons immediately — phase stays 'playing' but no more input
       setAnswerStatus('finishing')
-      endRound(currentCorrect, currentSkip, currentCrown, currentQueue)
+      endRound(currentCorrect, currentSkip, currentCrown, currentFast, currentQueue)
     } else {
       setAnswerStatus('idle')
       setQIndex(nextIndex)
@@ -383,7 +404,11 @@ export default function GamePage() {
       <div className="mx-4 mt-3 min-h-[76px]">
         {answerStatus === 'correct' && (
           <div className="rounded-2xl bg-green-500/20 border-2 border-green-400/50 py-4 text-center">
-            <p className="text-green-300 font-black text-3xl">✓ Riktig!</p>
+            {/* ⚡ appended inline rather than on its own row — a second line
+                would push this block past its reserved 76px. */}
+            <p className="text-green-300 font-black text-3xl">
+              ✓ Riktig!{wasFast && <span className="text-yellow-300"> ⚡ Lynraskt!</span>}
+            </p>
           </div>
         )}
         {answerStatus === 'finishing' && (

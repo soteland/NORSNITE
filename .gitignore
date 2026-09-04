@@ -26,3 +26,7 @@ Thumbs.db
 # Supabase local dev
 supabase/.branches
 supabase/.temp
+links.csv
+new.csv
+old.csv
+ny.csv

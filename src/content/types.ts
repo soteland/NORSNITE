@@ -10,6 +10,7 @@ export type QuestionType =
   | 'antonym'
   | 'rhyme'
   | 'double_consonant'
+  | 'word_recognition'
 
 export interface Word {
   id: string
@@ -130,6 +131,23 @@ export interface DoubleConsonantQuestion {
   teachingNote: string    // brief Norwegian spelling tip
 }
 
+// Word recognition: a target word on top, three visually similar words below
+// (mørk / mark / melk), tap the matching one. Pure fast-recognition drill for
+// readers who decode letter by letter.
+//
+// The three options are rendered at three DIFFERENT text sizes, shuffled per
+// question, so the word cannot be matched on width or shape — it has to be
+// read. `sizeOrder` is a permutation of 0-2 indexing the size scale in
+// WordRecognition.tsx, aligned positionally with `choices`.
+export interface WordRecognitionQuestion {
+  type: 'word_recognition'
+  id: string
+  difficulty: number
+  target: string          // shown on top; always one of `choices`
+  choices: string[]       // the three similar words, in shuffled display order
+  sizeOrder: number[]     // permutation of 0-2 → text size per choice
+}
+
 export type Question =
   | WordToImageQuestion
   | ImageToWordQuestion
@@ -142,3 +160,4 @@ export type Question =
   | AntonymQuestion
   | RhymeQuestion
   | DoubleConsonantQuestion
+  | WordRecognitionQuestion

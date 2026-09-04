@@ -8,6 +8,7 @@ import { synonymQuestions, getSynonymForDifficulty } from './synonyms'
 import { antonymQuestions, getAntonymForDifficulty } from './antonyms'
 import { rhymeQuestions, getRhymeForDifficulty } from './rhymes'
 import { doubleConsonantQuestions, getDoubleConsonantForDifficulty } from './doubleConsonant'
+import { wordRecognitionTriplets, getWordRecognitionForDifficulty } from './wordRecognition'
 import type {
   Question,
   Word,
@@ -22,6 +23,7 @@ import type {
   AntonymQuestion,
   RhymeQuestion,
   DoubleConsonantQuestion,
+  WordRecognitionQuestion,
   QuestionType,
 } from './types'
 
@@ -38,6 +40,7 @@ export type {
   AntonymQuestion,
   RhymeQuestion,
   DoubleConsonantQuestion,
+  WordRecognitionQuestion,
 }
 export { words, getWordsByCategory, getWordsForDifficulty }
 export { spellWords, getSpellWordsForDifficulty }
@@ -49,6 +52,7 @@ export { synonymQuestions, getSynonymForDifficulty }
 export { antonymQuestions, getAntonymForDifficulty }
 export { rhymeQuestions, getRhymeForDifficulty }
 export { doubleConsonantQuestions, getDoubleConsonantForDifficulty }
+export { wordRecognitionTriplets, getWordRecognitionForDifficulty }
 
 // Fisher-Yates shuffle
 export function shuffleArray<T>(arr: T[]): T[] {
@@ -136,6 +140,11 @@ export function getDoubleConsonantsForDifficulty(difficulty: number): DoubleCons
   return getDoubleConsonantForDifficulty(difficulty)
 }
 
+// Get word-recognition questions for a difficulty level
+export function getWordRecognitionsForDifficulty(difficulty: number): WordRecognitionQuestion[] {
+  return getWordRecognitionForDifficulty(difficulty)
+}
+
 // Pick a random question of any type for a given difficulty level.
 // excludeIds prevents repeating questions in the same round.
 export function pickRandomQuestion(
@@ -154,6 +163,7 @@ export function pickRandomQuestion(
     'antonym',
     'rhyme',
     'double_consonant',
+    'word_recognition',
     // comprehension kept for longer sessions; add to preferredTypes if needed
   ]
   const type = types[Math.floor(Math.random() * types.length)]
@@ -221,6 +231,12 @@ export function pickRandomQuestion(
 
   if (type === 'double_consonant') {
     const pool = getDoubleConsonantForDifficulty(difficulty).filter(q => !excludeIds.includes(q.id))
+    if (!pool.length) return null
+    return pool[Math.floor(Math.random() * pool.length)]
+  }
+
+  if (type === 'word_recognition') {
+    const pool = getWordRecognitionForDifficulty(difficulty).filter(q => !excludeIds.includes(q.id))
     if (!pool.length) return null
     return pool[Math.floor(Math.random() * pool.length)]
   }
