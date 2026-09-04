@@ -7,6 +7,7 @@ import WordOrder from './WordOrder'
 import SpellIt from './SpellIt'
 import SynonymGame from './SynonymGame'
 import RhymeGame from './RhymeGame'
+import DoubleConsonant from './DoubleConsonant'
 
 interface Props {
     question: Question
@@ -59,5 +60,7 @@ export default function QuestionCard({ question, onAnswer, disabled }: Props) {
             return <SynonymGame question={question} onAnswer={onAnswer} disabled={disabled} />
         case 'rhyme':
             return <RhymeGame question={question} onAnswer={onAnswer} disabled={disabled} />
+        case 'double_consonant':
+            return <DoubleConsonant question={question} onAnswer={onAnswer} disabled={disabled} />
     }
 }

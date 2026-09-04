@@ -15,6 +15,7 @@ import {
     getSynonymForDifficulty,
     getAntonymForDifficulty,
     getRhymeForDifficulty,
+    getDoubleConsonantsForDifficulty,
 } from '@/content'
 import type { Question, QuestionType } from '@/content/types'
 import QuestionCard from '@/components/game/QuestionCard'
@@ -37,6 +38,7 @@ const TYPES: { type: QuestionType; label: string }[] = [
     { type: 'synonym', label: 'Synonym' },
     { type: 'antonym', label: 'Motsetning' },
     { type: 'rhyme', label: 'Riming' },
+    { type: 'double_consonant', label: 'Dobbel konsonant' },
 ]
 
 function buildQuestion(type: QuestionType, difficulty: number): Question | null {
@@ -47,6 +49,11 @@ function buildQuestion(type: QuestionType, difficulty: number): Question | null 
     }
     if (type === 'punctuation') {
         const pool = getPunctuationForDifficulty(difficulty)
+        if (!pool.length) return null
+        return pool[Math.floor(Math.random() * pool.length)]
+    }
+    if (type === 'double_consonant') {
+        const pool = getDoubleConsonantsForDifficulty(difficulty)
         if (!pool.length) return null
         return pool[Math.floor(Math.random() * pool.length)]
     }
@@ -182,11 +189,11 @@ export default function DevPage() {
             setAnswerStatus('wrong')
             setHintVisible(false)
             playWrong()
-            if (question.type === 'punctuation') setTeachingNote(question.teachingNote)
+            if (question.type === 'punctuation' || question.type === 'double_consonant') setTeachingNote(question.teachingNote)
             speak(getCorrectAnswerText(question))
             setTimeout(() => {
                 setAnswerStatus('showing_correct')
-                if (question.type === 'punctuation') {
+                if (question.type === 'punctuation' || question.type === 'double_consonant') {
                     setTimeout(() => setHintVisible(true), 700)
                 }
                 setTimeout(() => nextQuestion(), 2500)

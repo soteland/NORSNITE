@@ -7,6 +7,7 @@ import { punctuationQuestions } from './punctuation'
 import { synonymQuestions, getSynonymForDifficulty } from './synonyms'
 import { antonymQuestions, getAntonymForDifficulty } from './antonyms'
 import { rhymeQuestions, getRhymeForDifficulty } from './rhymes'
+import { doubleConsonantQuestions, getDoubleConsonantForDifficulty } from './doubleConsonant'
 import type {
   Question,
   Word,
@@ -20,6 +21,7 @@ import type {
   SynonymQuestion,
   AntonymQuestion,
   RhymeQuestion,
+  DoubleConsonantQuestion,
   QuestionType,
 } from './types'
 
@@ -35,6 +37,7 @@ export type {
   SynonymQuestion,
   AntonymQuestion,
   RhymeQuestion,
+  DoubleConsonantQuestion,
 }
 export { words, getWordsByCategory, getWordsForDifficulty }
 export { spellWords, getSpellWordsForDifficulty }
@@ -45,6 +48,7 @@ export { punctuationQuestions }
 export { synonymQuestions, getSynonymForDifficulty }
 export { antonymQuestions, getAntonymForDifficulty }
 export { rhymeQuestions, getRhymeForDifficulty }
+export { doubleConsonantQuestions, getDoubleConsonantForDifficulty }
 
 // Fisher-Yates shuffle
 export function shuffleArray<T>(arr: T[]): T[] {
@@ -127,6 +131,11 @@ export function getAntonymsForDifficulty(difficulty: number): AntonymQuestion[] 
   return getAntonymForDifficulty(difficulty)
 }
 
+// Get double-consonant questions for a difficulty level
+export function getDoubleConsonantsForDifficulty(difficulty: number): DoubleConsonantQuestion[] {
+  return getDoubleConsonantForDifficulty(difficulty)
+}
+
 // Pick a random question of any type for a given difficulty level.
 // excludeIds prevents repeating questions in the same round.
 export function pickRandomQuestion(
@@ -144,6 +153,7 @@ export function pickRandomQuestion(
     'synonym',
     'antonym',
     'rhyme',
+    'double_consonant',
     // comprehension kept for longer sessions; add to preferredTypes if needed
   ]
   const type = types[Math.floor(Math.random() * types.length)]
@@ -205,6 +215,12 @@ export function pickRandomQuestion(
 
   if (type === 'rhyme') {
     const pool = getRhymeForDifficulty(difficulty).filter(q => !excludeIds.includes(q.id))
+    if (!pool.length) return null
+    return pool[Math.floor(Math.random() * pool.length)]
+  }
+
+  if (type === 'double_consonant') {
+    const pool = getDoubleConsonantForDifficulty(difficulty).filter(q => !excludeIds.includes(q.id))
     if (!pool.length) return null
     return pool[Math.floor(Math.random() * pool.length)]
   }

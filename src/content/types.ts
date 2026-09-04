@@ -9,6 +9,7 @@ export type QuestionType =
   | 'synonym'
   | 'antonym'
   | 'rhyme'
+  | 'double_consonant'
 
 export interface Word {
   id: string
@@ -115,6 +116,20 @@ export interface RhymeQuestion {
   choices: string[]  // includes correct; shuffle at runtime
 }
 
+// Pick the correctly spelled word for a sentence: single vs double consonant
+// ("Jeg ___ hjem" → løper / løpper). Deliberately only two choices — the
+// single/double contrast IS the exercise.
+export interface DoubleConsonantQuestion {
+  type: 'double_consonant'
+  id: string
+  difficulty: number
+  sentence: string        // contains ___ for the blank
+  correct: string         // correctly spelled form
+  wrong: string           // the other spelling
+  choices: string[]       // [correct, wrong] in shuffled display order
+  teachingNote: string    // brief Norwegian spelling tip
+}
+
 export type Question =
   | WordToImageQuestion
   | ImageToWordQuestion
@@ -126,3 +141,4 @@ export type Question =
   | SynonymQuestion
   | AntonymQuestion
   | RhymeQuestion
+  | DoubleConsonantQuestion

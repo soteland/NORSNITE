@@ -12,12 +12,17 @@ import RoundResult from '@/components/game/RoundResult'
 import LootBox from '@/components/game/LootBox'
 import GameMenu from '@/components/layout/GameMenu'
 import type { Database } from '@/lib/supabase/client'
-import type { Question } from '@/content/types'
+import type { Question, PunctuationQuestion, DoubleConsonantQuestion } from '@/content/types'
 
 import norsniteLogo from '/images/norsnite-logo.png'
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row']
 type Phase = 'loading' | 'playing' | 'loot' | 'result' | 'error'
+
+/** The only question types that carry a teachingNote, and so reserve hint space. */
+function hasTeachingNote(q: Question): q is PunctuationQuestion | DoubleConsonantQuestion {
+  return q.type === 'punctuation' || q.type === 'double_consonant'
+}
 type AnswerStatus = 'idle' | 'correct' | 'wrong' | 'showing_correct' | 'finishing'
 
 export default function GamePage() {
@@ -179,11 +184,11 @@ export default function GamePage() {
       playWrong()
       const correctText = getCorrectAnswerText(current)
       speak(correctText)
-      if (current.type === 'punctuation') setTeachingNote(current.teachingNote)
+      if (hasTeachingNote(current)) setTeachingNote(current.teachingNote)
       setTimeout(() => {
         setAnswerStatus('showing_correct')
         // Delay hint reveal so it doesn't appear instantly
-        if (current.type === 'punctuation') {
+        if (hasTeachingNote(current)) {
           setTimeout(() => setHintVisible(true), 700)
         }
         setTimeout(() => {
@@ -411,10 +416,10 @@ export default function GamePage() {
         />
       </div>
 
-      {/* Teaching note — BELOW quiz, delayed reveal. Only 'punctuation' questions
-          ever have a teachingNote, so the height is reserved only for those;
-          reserving it on all 10 types cost every other type 68px. */}
-      {currentQuestion.type === 'punctuation' && (
+      {/* Teaching note — BELOW quiz, delayed reveal. Only 'punctuation' and
+          'double_consonant' questions carry a teachingNote, so the height is
+          reserved only for those; reserving it on every type cost the rest 68px. */}
+      {hasTeachingNote(currentQuestion) && (
         <div className="mx-4 mb-4 min-h-[52px]">
           {answerStatus === 'showing_correct' && teachingNote && hintVisible && (
             <div className="rounded-2xl bg-amber-500/20 border-2 border-amber-400/50 px-4 py-3 text-center">

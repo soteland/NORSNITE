@@ -1,0 +1,53 @@
+import type { DoubleConsonantQuestion } from '@/content/types'
+
+interface Props {
+    question: DoubleConsonantQuestion
+    onAnswer: (correct: boolean) => void
+    disabled: boolean
+}
+
+function renderSentence(sentence: string) {
+    const parts = sentence.split('___')
+    return (
+        <span>
+            {parts[0]}
+            <span className="inline-block mx-1 px-3 py-0.5 bg-white/20 rounded-lg font-bold text-yellow-300 min-w-[3.5rem] text-center">
+                ___
+            </span>
+            {parts[1]}
+        </span>
+    )
+}
+
+export default function DoubleConsonant({ question, onAnswer, disabled }: Props) {
+    // question.choices is [correct, wrong] pre-shuffled by the content selector,
+    // so the order stays put across the wrong-answer re-render and the retry.
+    return (
+        <div className="flex flex-col items-center gap-6 w-full">
+            <div className="text-center max-w-sm">
+                <p className="text-2xl font-bold tracking-wide text-[var(--muted)] mb-3">
+                    Velg riktig skrivemåte
+                </p>
+                <p className="text-2xl font-bold text-white leading-relaxed">
+                    {renderSentence(question.sentence)}
+                </p>
+            </div>
+
+            <div className="flex flex-col gap-3 w-full max-w-sm">
+                {question.choices.map((choice) => (
+                    <button
+                        key={choice}
+                        disabled={disabled}
+                        onClick={() => onAnswer(choice === question.correct)}
+                        className="w-full py-4 px-6 rounded-2xl bg-white/10 border-2 border-white/20
+                       text-white text-2xl font-black text-center tracking-wide
+                       hover:bg-white/20 active:scale-[0.98] transition-all
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {choice}
+                    </button>
+                ))}
+            </div>
+        </div>
+    )
+}
