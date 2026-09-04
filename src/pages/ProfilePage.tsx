@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/auth/AuthContext'
-import { getLeague, xpToNextLeague, LEAGUE_THRESHOLDS } from '@/lib/xp'
+import { getLeague, xpToNextLeague, LEAGUE_THRESHOLDS, LEAGUES } from '@/lib/xp'
 import { useAchievements } from '@/hooks/useAchievements'
 import { ACHIEVEMENTS, DAILY_XP_ACHIEVEMENTS, LEAGUE_ACHIEVEMENTS } from '@/lib/achievements'
 import { AchievementGrid } from '@/components/game/AchievementBadge'
@@ -140,6 +140,12 @@ export default function ProfilePage() {
     const currentThreshold = LEAGUE_THRESHOLDS[league]
     const nextThreshold = next ? LEAGUE_THRESHOLDS[next.league] : currentThreshold + 1
     const progressRatio = Math.min(1, (profile.total_xp - currentThreshold) / (nextThreshold - currentThreshold))
+
+    // League badges are deterministic — earned if the user has reached that league by XP.
+    // Merge with earnedKeys so the grid is never wrong due to DB gaps.
+    const leagueIdx = LEAGUES.indexOf(league)
+    const xpLeagueKeys = new Set(LEAGUE_ACHIEVEMENTS.slice(0, leagueIdx + 1).map(a => a.key))
+    const effectiveEarnedKeys = new Set([...earnedKeys, ...xpLeagueKeys])
 
     const leagueEmoji: Record<string, string> = {
         Bronze: '🥉', Silver: '🥈', Gold: '🥇', Platinum: '💎',
@@ -317,7 +323,7 @@ export default function ProfilePage() {
 
                         <div className="space-y-3">
                             <p className="text-md text-[var(--muted)] font-bold text-center">Ligaer</p>
-                            <AchievementGrid achievements={LEAGUE_ACHIEVEMENTS} earnedKeys={earnedKeys} />
+                            <AchievementGrid achievements={LEAGUE_ACHIEVEMENTS} earnedKeys={effectiveEarnedKeys} />
                         </div>
                     </div>
                 )}

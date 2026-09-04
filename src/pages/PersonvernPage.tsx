@@ -2,7 +2,11 @@ import { Link } from '@tanstack/react-router'
 
 export default function PersonvernPage() {
   return (
-    <div className="min-h-screen p-6 max-w-2xl mx-auto">
+    <div className="min-h-[100dvh] p-6 max-w-2xl mx-auto"
+      style={{
+        paddingTop: 'max(env(safe-area-inset-top), 24px)',
+        paddingBottom: 'max(env(safe-area-inset-bottom), 24px)',
+      }}>
       <Link to="/logg-inn" className="text-[var(--accent)] text-sm hover:underline">← Tilbake</Link>
 
       <h1 className="text-3xl font-black mt-6 mb-4">Personvern</h1>

@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/auth/AuthContext'
 import { useGameStore } from '@/lib/store/gameStore'
-import { calculateXp, rollCrown } from '@/lib/xp'
+import { calculateXp, rollCrown, rollComebackBonus } from '@/lib/xp'
 import { buildRound, getCorrectAnswerText } from '@/lib/roundController'
 import { speak, speakThen, playCorrect, playWrong, playRoundDone, playPerfect } from '@/lib/speech'
 import { useAchievements } from '@/hooks/useAchievements'
@@ -108,9 +108,9 @@ export default function GamePage() {
     if (xpResult.isPerfect) playPerfect()
     else playRoundDone()
 
-    // Roll comeback if zero correct
+    // Roll comeback if the round went badly (≤40% correct)
     let activatedComeback = false
-    if (finalCorrect === 0 && Math.random() < 0.25) {
+    if (rollComebackBonus(finalCorrect, originalCount)) {
       activateComeback()
       activatedComeback = true
     }
@@ -356,15 +356,16 @@ export default function GamePage() {
           className="h-full bg-purple-500 rounded-full transition-all duration-500"
           style={{ width: `${Math.min(100, (Math.min(qIndex, originalCount) / originalCount) * 100)}%` }}
         />
-          </div>
-          
-          <span className="text-3xl">
-              {crownActive && <div className='text-center flex flex-col mt-4 '>
-              <span className='text-5xl'>👑</span>
-              <span className='text-xl mt-2'>Du har krone denne runden!</span>
-          </div>}
-          </span>
-          
+      </div>
+
+      {/* Crown banner — first question only. The 👑 in the top bar is the
+          persistent indicator; this block used to render all round and cost
+          ~90px of vertical space on a 390x844 screen. */}
+      {crownActive && qIndex === 0 && (
+        <div className="mx-4 mt-2 px-3 py-1.5 rounded-xl bg-yellow-500/15 border border-yellow-400/30 text-center">
+          <p className="text-yellow-200 text-sm font-bold">👑 Du har krone denne runden!</p>
+        </div>
+      )}
 
       {/* Comeback bonus indicator */}
       {comebackAtStart.current && (
@@ -400,8 +401,9 @@ export default function GamePage() {
         )}
       </div>
 
-      {/* Question */}
-      <div className="flex-1 flex items-center justify-center px-4 pt-4 pb-2">
+      {/* Question — scrolls rather than clipping if a long word or a 4-choice
+          grid still exceeds the space (iPhone 12 leaves ~470px here). */}
+      <div className="flex-1 flex items-center justify-center px-4 pt-4 pb-2 overflow-y-auto">
         <QuestionCard
           question={currentQuestion}
           onAnswer={handleAnswer}
@@ -409,14 +411,18 @@ export default function GamePage() {
         />
       </div>
 
-      {/* Teaching note — BELOW quiz, reserved space, delayed reveal */}
-      <div className="mx-4 mb-4 min-h-[52px]">
-        {answerStatus === 'showing_correct' && teachingNote && hintVisible && (
-          <div className="rounded-2xl bg-amber-500/20 border-2 border-amber-400/50 px-4 py-3 text-center">
-            <p className="text-amber-200 font-bold text-base">💡 {teachingNote}</p>
-          </div>
-        )}
-      </div>
+      {/* Teaching note — BELOW quiz, delayed reveal. Only 'punctuation' questions
+          ever have a teachingNote, so the height is reserved only for those;
+          reserving it on all 10 types cost every other type 68px. */}
+      {currentQuestion.type === 'punctuation' && (
+        <div className="mx-4 mb-4 min-h-[52px]">
+          {answerStatus === 'showing_correct' && teachingNote && hintVisible && (
+            <div className="rounded-2xl bg-amber-500/20 border-2 border-amber-400/50 px-4 py-3 text-center">
+              <p className="text-amber-200 font-bold text-base">💡 {teachingNote}</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

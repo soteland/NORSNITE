@@ -14,7 +14,7 @@ export default function RhymeGame({ question, onAnswer, disabled }: Props) {
     return (
         <div className="flex flex-col items-center gap-6 w-full">
             <div className="text-center">
-                <p className="text-3xl font-bold tracking-wide text-[var(--muted)] mb-2">
+                <p className="text-xl font-bold tracking-wide text-[var(--muted)] mb-2">
                     Hvilket ord rimer på
                 </p>
                 <h2 className="text-4xl font-black text-white">{question.word}</h2>

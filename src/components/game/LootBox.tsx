@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase/client'
+import { roundBaseXp } from '@/lib/xp'
 import chestVanlig from '@/images/chest-vanlig.png'
 import chestSjelden from '@/images/chest-sjelden.png'
 import chestEpisk from '@/images/chest-episk.png'
@@ -31,85 +32,108 @@ const RARITY_STYLE: Record<Rarity, { color: string; label: string; glow: string;
     legendarisk: { color: '#f59e0b', label: 'Legendarisk', glow: 'rgba(245,158,11,0.50)', textColor: '#fcd34d' },
 }
 
-interface Reward { xp: number; skip: number; shield: number }
+interface Reward {
+    xp: number
+    skip: number
+    shield: number
+    /** Set when a full shield/skip bank was converted to XP instead of discarded */
+    convertedFrom?: 'shield' | 'skip'
+}
 
 /**
- * Vanlig / Sjelden → fixed XP reward.
- * Episk / Legendarisk → random roll against loot table at chest-open time.
- *
- * Episk table:
- *   60% → XP 80–160
- *   15% → 1 hopp-token
- *   20% → 1-dagers skjold
- *    5% → 2-dagers skjold
- *
- * Legendarisk table:
- *   50% → XP 160–240
- *   20% → 1 hopp-token
- *   18% → 1-dagers skjold
- *    6% → 2-dagers skjold
- *    4% → 3-dagers skjold
- *    2% → 5-dagers skjold
+ * XP payout as a multiple of the player's round base XP (round length × BASE_XP:
+ * 25 in Bronze, 45 in Unreal). Scaling off the round rather than paying flat XP
+ * keeps a chest worth ~20% of income at every league — the old flat 50–240 XP
+ * was worth 2-3 whole Bronze rounds, which is what let players sprint the early
+ * ladder in an hour.
  */
-function rollReward(rarity: Rarity): Reward {
-    if (rarity === 'vanlig') return { xp: 25, skip: 0, shield: 0 }
+const RARITY_XP_MULT: Record<Rarity, number> = {
+    vanlig: 1.0,
+    sjelden: 1.5,
+    episk: 2.5,
+    mytisk: 4.0,
+    legendarisk: 6.0,
+}
+
+/** XP for a rarity, ±15% jitter so the number isn't identical every chest */
+function xpFor(rarity: Rarity, roundBase: number): number {
+    const jitter = 0.85 + Math.random() * 0.30
+    return Math.round(roundBase * RARITY_XP_MULT[rarity] * jitter)
+}
+
+/**
+ * Reward for a chest of the given rarity. The XP/skip/shield split per rarity is
+ * unchanged; only the XP amounts are now league-scaled via xpFor().
+ */
+function rollReward(rarity: Rarity, roundBase: number): Reward {
+    const r = Math.random()
+
+    if (rarity === 'vanlig') return { xp: xpFor('vanlig', roundBase), skip: 0, shield: 0 }
+
     if (rarity === 'sjelden') {
-        const r = Math.random()
-        if (r < 0.80) return { xp: 40, skip: 0, shield: 0 }
+        if (r < 0.80) return { xp: xpFor('sjelden', roundBase), skip: 0, shield: 0 }
         if (r < 0.90) return { xp: 0, skip: 1, shield: 0 }
         return { xp: 0, skip: 0, shield: 1 }
     }
 
-    const r = Math.random()
-
     if (rarity === 'episk') {
-        if (r < 0.65) return { xp: 60 + Math.floor(Math.random() * 81), skip: 0, shield: 0 }
+        if (r < 0.65) return { xp: xpFor('episk', roundBase), skip: 0, shield: 0 }
         if (r < 0.80) return { xp: 0, skip: 1, shield: 0 }
         if (r < 0.95) return { xp: 0, skip: 0, shield: 1 }
         return { xp: 0, skip: 0, shield: 2 }
     }
 
-    //change this
     if (rarity === 'mytisk') {
-        if (r < 0.60) return { xp: 100 + Math.floor(Math.random() * 81), skip: 0, shield: 0 }
+        if (r < 0.60) return { xp: xpFor('mytisk', roundBase), skip: 0, shield: 0 }
         if (r < 0.75) return { xp: 0, skip: 1, shield: 0 }
         if (r < 0.95) return { xp: 0, skip: 0, shield: 1 }
         return { xp: 0, skip: 0, shield: 2 }
     }
 
     // legendarisk
-    if (r < 0.50) return { xp: 160 + Math.floor(Math.random() * 81), skip: 0, shield: 0 }
+    if (r < 0.50) return { xp: xpFor('legendarisk', roundBase), skip: 0, shield: 0 }
     if (r < 0.70) return { xp: 0, skip: 1, shield: 0 }
     if (r < 0.88) return { xp: 0, skip: 0, shield: 1 }
     if (r < 0.94) return { xp: 0, skip: 0, shield: 2 }
     if (r < 0.98) return { xp: 0, skip: 0, shield: 3 }
-
-    // 2% chance for 5-dagers skjold
     return { xp: 0, skip: 0, shield: 5 }
 }
 
-/** Roll for rarity upgrade after each click */
+/**
+ * Roll for a rarity upgrade after each of the first two taps.
+ *
+ * These are tuned so two taps from 'vanlig' land on roughly:
+ *   vanlig 42% · sjelden 35% · episk 16% · mytisk 5% · legendarisk 1.6%
+ *
+ * The previous tables produced episk 41% / mytisk 26% / legendarisk 11% — two
+ * thirds of chests were Epic-or-better, so the gold glow carried no signal at
+ * all. Legendarisk now lands about once every 60 chests (~300 rounds), which is
+ * rare enough to matter and frequent enough that a kid still sees it.
+ *
+ * If you retune these, recompute the final distribution — it is the product of
+ * two taps, not the single-tap numbers.
+ */
 function rollUpgrade(current: Rarity): Rarity {
     const r = Math.random()
     if (current === 'vanlig') {
-        if (r < 0.40) return 'sjelden'
-        if (r < 0.65) return 'episk'
-        if (r < 0.75) return 'mytisk'
+        if (r < 0.26) return 'sjelden'
+        if (r < 0.33) return 'episk'
+        if (r < 0.35) return 'mytisk'
         return 'vanlig'
     }
     if (current === 'sjelden') {
-        if (r < 0.50) return 'episk'
-        if (r < 0.75) return 'mytisk'
-        if (r < 0.85) return 'legendarisk'
+        if (r < 0.22) return 'episk'
+        if (r < 0.27) return 'mytisk'
+        if (r < 0.29) return 'legendarisk'
         return 'sjelden'
     }
     if (current === 'episk') {
-        if (r < 0.20) return 'mytisk'
-        if (r < 0.40) return 'legendarisk'
+        if (r < 0.15) return 'mytisk'
+        if (r < 0.23) return 'legendarisk'
         return 'episk'
     }
     if (current === 'mytisk') {
-        if (r < 0.20) return 'legendarisk'
+        if (r < 0.25) return 'legendarisk'
         return 'mytisk'
     }
     return current // legendarisk — can't go higher
@@ -120,6 +144,8 @@ function rewardLines(reward: Reward): string[] {
     if (reward.xp) lines.push(`✨ +${reward.xp} XP`)
     if (reward.skip) lines.push(`⚡ ${reward.skip} hopp-token!`)
     if (reward.shield) lines.push(`🛡️ ${reward.shield}-dagers strekk-skjold!`)
+    if (reward.convertedFrom === 'shield') lines.push('🛡️ Skjoldet ditt er fullt — gjort om til XP!')
+    if (reward.convertedFrom === 'skip') lines.push('⚡ Du har maks hopp-tokens — gjort om til XP!')
     return lines
 }
 
@@ -144,26 +170,46 @@ export default function LootBox({ userId, onComplete }: Props) {
         applyingRef.current = true
         setPhase('applying')
 
-        const rolled = rollReward(finalRarity)
-        setReward(rolled)
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('total_xp, skip_tokens, streak_shield_days')
+            .eq('id', userId)
+            .single()
 
-        try {
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('total_xp, skip_tokens, streak_shield_days')
-                .eq('id', userId)
-                .single()
+        // Roll against the player's own league so the payout scales with round
+        // length. If the profile read failed, roundBaseXp(0) falls back to Bronze.
+        const roundBase = roundBaseXp(profile?.total_xp ?? 0)
+        const rolled = rollReward(finalRarity, roundBase)
 
-            if (profile) {
-                await supabase.from('profiles').update({
-                    total_xp: profile.total_xp + rolled.xp,
-                    skip_tokens: Math.min(5, profile.skip_tokens + rolled.skip),
-                    streak_shield_days: Math.min(7, profile.streak_shield_days + rolled.shield),
-                    rounds_since_loot: 0,
-                }).eq('id', userId)
-            }
-        } catch {
-            // Non-fatal — still show the reward screen
+        // Shields cap at 7 days and skip tokens at 5. Previously the excess was
+        // silently swallowed by min() while the reveal screen still announced the
+        // full amount — so a daily player with a full bank saw ~40% of chests
+        // promise a shield and deliver nothing. Convert the overflow to XP
+        // instead, and report only what was actually banked.
+        const shieldGranted = Math.min(rolled.shield, Math.max(0, 7 - (profile?.streak_shield_days ?? 0)))
+        const skipGranted = Math.min(rolled.skip, Math.max(0, 5 - (profile?.skip_tokens ?? 0)))
+        const shieldOverflow = rolled.shield - shieldGranted
+        const skipOverflow = rolled.skip - skipGranted
+
+        const granted: Reward = {
+            xp: rolled.xp
+                + Math.round(shieldOverflow * roundBase * 0.8)
+                + Math.round(skipOverflow * roundBase * 0.6),
+            skip: skipGranted,
+            shield: shieldGranted,
+            convertedFrom: shieldOverflow > 0 ? 'shield' : skipOverflow > 0 ? 'skip' : undefined,
+        }
+        setReward(granted)
+
+        if (profile) {
+            // Read-then-write, so a concurrent write could clobber this. Accepted:
+            // one device per kid, and the alternative is a server round-trip.
+            await supabase.from('profiles').update({
+                total_xp: profile.total_xp + granted.xp,
+                skip_tokens: profile.skip_tokens + granted.skip,
+                streak_shield_days: profile.streak_shield_days + granted.shield,
+                rounds_since_loot: 0,
+            }).eq('id', userId)
         }
         setPhase('revealed')
     }

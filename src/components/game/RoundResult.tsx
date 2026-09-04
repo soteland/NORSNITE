@@ -15,7 +15,7 @@ interface Props {
   profileAfter: ProfileRow
   xpResult: XpResult
   crownActive: boolean
-  comebackJustActivated: boolean  // true if 0-correct + lucky roll this round
+  comebackJustActivated: boolean  // true if the round went badly (≤40% correct) + lucky roll
   newAchievementKeys?: string[]
   onPlayAgain: () => void
 }
@@ -275,18 +275,27 @@ export default function RoundResult({
             </motion.div>
           )}
 
-          {/* Play again */}
-          <motion.button
+          {/* Play again — sticky. This screen stacks promotion + XP + new
+              achievements + difficulty check + viking message + the "nesten der"
+              hook above it, which on a 390x844 phone pushed the primary CTA
+              below the fold exactly when the round went best. mt-auto also keeps
+              it bottom-anchored on short results, so it's always in the same place. */}
+          <motion.div
             variants={fadeUp}
-            onClick={onPlayAgain}
-            className="mt-1 w-full max-w-sm py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-500
-                       text-white font-black text-xl hover:from-purple-500 hover:to-purple-400
-                       active:scale-[0.98] transition-all shadow-lg shadow-purple-900/50"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
+            className="sticky bottom-0 mt-auto w-full max-w-sm pt-5 pb-1"
+            style={{ background: 'linear-gradient(to top, var(--bg) 60%, transparent)' }}
           >
-            Spill igjen? 🎮
-          </motion.button>
+            <motion.button
+              onClick={onPlayAgain}
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-500
+                         text-white font-black text-xl hover:from-purple-500 hover:to-purple-400
+                         active:scale-[0.98] transition-all shadow-lg shadow-purple-900/50"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              Spill igjen? 🎮
+            </motion.button>
+          </motion.div>
         </motion.div>
       )}
     </>

@@ -14,10 +14,12 @@ export default function ImageToWord({ question, onAnswer, disabled }: Props) {
     return (
         <div className="flex flex-col items-center gap-6 w-full">
             <div className="text-center">
-                <p className="text-3xl font-bold tracking-wide text-[var(--muted)] mb-3">
+                <p className="text-xl font-bold tracking-wide text-[var(--muted)] mb-3">
                     Hvilket ord passer til bildet?
                 </p>
-                <span className="text-9xl">{question.target.emoji}</span>
+                {/* text-9xl (128px) pushed the answer buttons off-screen on a
+                    390x844 phone; text-7xl (72px) is still a big, clear target. */}
+                <span className="text-7xl">{question.target.emoji}</span>
             </div>
 
             <div className="flex flex-col gap-3 w-full max-w-sm">

@@ -91,7 +91,13 @@ export default function SpellIt({ question, onAnswer, disabled }: Props) {
   const isComplete = typed.length === target.length
 
   return (
-    <div className="flex flex-col items-center gap-5 w-full max-w-sm mx-auto">
+    <div className="flex flex-col items-center gap-4 w-full max-w-sm mx-auto">
+
+      {/* Prompt — this was the only minigame with no instruction at all: the kid
+          got an emoji and empty slots and had to infer the task. */}
+      <p className="text-xl font-bold tracking-wide text-[var(--muted)]">
+        Skriv ordet
+      </p>
 
       {/* Emoji hint — tap to hear word */}
       <button
@@ -102,8 +108,6 @@ export default function SpellIt({ question, onAnswer, disabled }: Props) {
       >
         {question.word.emoji}
       </button>
-
-      
 
       {/* Answer slots */}
       <div className={`flex gap-1.5 flex-wrap justify-center ${shake ? 'shake' : ''}`}>
@@ -131,7 +135,7 @@ export default function SpellIt({ question, onAnswer, disabled }: Props) {
                 key={tile.id}
                 disabled={disabled || tile.used}
                 onClick={() => tapTile(tile)}
-                className={`w-11 h-11 rounded-xl text-xl font-black transition-all
+                className={`w-12 h-12 rounded-xl text-xl font-black transition-all
                   border-2 select-none
                   ${tile.used
                     ? 'bg-white/5 border-white/5 text-white/0 cursor-not-allowed'

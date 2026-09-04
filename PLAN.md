@@ -17,9 +17,9 @@ Inspired by Fortnite's progression loop and Duolingo's minigame variety.
 - **Client state**: Zustand (spilltilstand, aktiv runde, crown)
 - **UI**: shadcn/ui + Tailwind CSS
 - **Animasjoner**: Framer Motion (Victory Royale, XP-bar, league promotion)
-- **Auth**: Google OAuth + Microsoft OAuth (no passwords). **ON ICE** — deprioritized; email/password works for now. **Microsoft school tenant caveat**: school Microsoft accounts may require IT admin consent before OAuth works. Test with a real school account before advertising class use. Gmail is sufficient for launch — Microsoft school OAuth is best-effort.
+- **Auth**: email/password (will look into enhancements)
 - **Tiers**: Bronze → Silver → Gold → Platinum → Diamond → Elite → Champion → Unreal
-- **Minigames**: 7 types, unlocked progressively by league
+- **Minigames**: 7+ types, unlocked progressively by league
 - **Avatar**: Simple 2D character with unlockable outfits and backgrounds
 - **Content**: Stored in TypeScript files, editable in code — no admin UI
 - **Social**: Friends list with league visibility; no teacher dashboard (v1)
@@ -28,7 +28,12 @@ Inspired by Fortnite's progression loop and Duolingo's minigame variety.
   - Nye spillere starter på **nivå 2** (litt utfordrende fra dag én — målet er at det skal være vanskelig)
   - Antall svaralternativer: nivå 1–4 → **3 valg**, nivå 5–10 → **4 valg** (gratis vanskelighetsøkning uten nytt innhold)
   - **Ligaterskel (gulv)** — vanskelighetsgrad kan aldri synke under dette per liga:
-    Bronze=1 | Silver=2 | Gold=3 | Platinum=4 | Diamond=5 | Elite=6 | Champion=7 | Unreal=8
+    Bronze=1 | Silver=1 | Gold=2 | Platinum=2 | Diamond=3 | Elite=4 | Champion=5 | Unreal=6
+    > ⚠️ **Revidert 2026-09-03** (var 1–8, én per liga). Gulvet er nå bevisst
+    > frakoblet ligaene: selvrapport (😴/😊/😤) er den egentlige driveren, og
+    > gulvet er kun et sikkerhetsnett. Det gamle 1:1-gulvet låste
+    > vanskelighetsgrad bak XP-grinding istedenfor faktisk mestring.
+    > Kilde: `LEAGUE_DIFFICULTY_FLOOR` i `src/lib/xp.ts` + `003_rebalance.sql`.
   - Ved **ligarykk**: hvis gjeldende vanskelighetsgrad < nytt gulv → bump automatisk til gulvet
   - **Hva vanskelighetsgraden påvirker per minigame**:
     - Ord→Bilde / Bilde→Ord: ordlengde og frekvens (korte hverdagsord → lange sammensatte ord)
@@ -62,7 +67,8 @@ Inspired by Fortnite's progression loop and Duolingo's minigame variety.
   | 9 | Avansert vokabular | Idiomatiske fraser |
   | 10 | Ekspertnivå | Langt avsnitt, full forståelse |
 - **XP-skalering**: Hvert league-tier krever 15% mer XP enn forrige (svakt eksponensielt på terskler, ikke per oppgave). Base XP: 5 XP per riktig svar. Bonuser: perfekt runde +25%, crown win +50%, comeback +25%. **Ingen daglig tak** — spill mer, få mer. Terskler (kumulativ): Bronze 0 | Silver 1 000 | Gold 2 150 | Platinum 3 472 | Diamond 4 993 | Elite 6 742 | Champion 8 753 | Unreal 11 066. Total til Unreal ≈ 11 066 XP.
-- **Rundelengde**: Styres av liganivå — Bronse: 5 spørsmål | Sølv: 6 | Gull: 7 | Platina: 8 | Diamant: 9 | Elite–Unreal: 10. Animasjoner og loot box tar lik andel av spilletiden uansett nivå. Høyere liga → naturlig mer XP per runde (flere spørsmål).
+- **Rundelengde**: Styres av liganivå — Bronse: 5 spørsmål | Sølv: 6 | Gull: 7 | Platina: 7 | Diamant: 8 | Elite: 8 | Champion: 9 | Unreal: 9. Animasjoner og loot box tar lik andel av spilletiden uansett nivå. Høyere liga → naturlig mer XP per runde (flere spørsmål).
+  > Justert ned fra 5/6/7/8/9/10/10/10 i koden. `ROUND_LENGTH` i `src/lib/xp.ts` er kilden.
 - **Innhold**: Schema defineres i kode, mengde genereres med GPT-4/5 mini etterpå. Kategorier avklares separat.
 - **GDPR**: Personvernerklæring i appen = tilstrekkelig. Prosjektet open source.
 - **Usernames**: Auto-generated fra lokal norsk ordliste (adj + substantiv + 1-3 siffer). 600 000 unike kombinasjoner. Kan renames én gang per 30 dager (`last_rename_at` i profiles).
@@ -70,16 +76,31 @@ Inspired by Fortnite's progression loop and Duolingo's minigame variety.
 - **Word lists**: Curated, kid-appropriate Norwegian words stored in `src/lib/username/`
 - **Audio**: Web Speech API (browser built-in, `speechSynthesis`, Norwegian locale `nb-NO`). Zero cost, no server, works in Safari + Chrome on iPad/iPhone.
 - **Friends**: Eksakt brukernavn-søk. Forespørsel + godkjenning (ikke instant). Email aldri eksponert. GDPR-compliant.
-- **Loot box**: 3-klikks kiste — klikk 1+2 rister kisten, klikk 3 sprenger den åpen (Framer Motion). Trigges etter **5 fullførte runder** (etter runde 1 for nye spillere). Serveren ruller loot i `claim_loot()` RPC. Innhold:
+- **Loot box**: 3-klikks kiste — klikk 1+2 ruller raritets-oppgradering, klikk 3 sprenger den åpen og ruller belønningen (Framer Motion). Trigges etter **5 fullførte runder** (etter runde 1 for nye spillere).
+  > ⚠️ **Revidert 2026-09-03.** Loot rulles **i klienten** (`LootBox.tsx`), ikke i
+  > `claim_loot()` — RPC-en er død kode og tabellen under er ikke den gamle
+  > server-tabellen. XP skaleres nå som et multiplum av rundens base-XP
+  > (rundelengde × 5: 25 i Bronse, 45 i Unreal) istedenfor flate 50–240, slik at
+  > en kiste er ~20% av inntekten i **alle** ligaer. Før var den 35% i Bronse.
 
-  | Sannsynlighet | Rarity | Belønning |
+  Raritetsfordeling etter to oppgraderingsklikk (verifisert med 2M simulerte kister):
+
+  | Rarity | Sannsynlighet | XP (× rundens base-XP) |
   |---|---|---|
-  | 60% | Vanlig (grå) | XP — tilfeldig 50–100 |
-  | 10% | Uvanlig (grønn) | ⚡ Hopp-token |
-  | 18% | Uvanlig (grønn) | 🛡️ 1-dags strekk-skjold |
-  | 6% | Sjelden (blå) | 🛡️🛡️ 2-dagers strekk-skjold |
-  | 4% | Episk (lilla) | 🛡️🛡️🛡️ 3-dagers strekk-skjold |
-  | 2% | Legendarisk (gull) | 🛡️×5 5-dagers strekk-skjold |
+  | Vanlig (grå) | 42,2 % | 1,0× |
+  | Sjelden (blå) | 35,3 % | 1,5× |
+  | Episk (lilla) | 15,7 % | 2,5× |
+  | Mytisk (grønn) | 5,1 % | 4,0× |
+  | Legendarisk (gull) | 1,6 % — ca. 1 av 63 | 6,0× |
+
+  Var tidligere Episk 41 % / Mytisk 26 % / Legendarisk 11 % — to av tre kister var
+  Episk eller bedre, så gullgløden betydde ingenting. Hver rarity kan gi ⚡hopp-token
+  eller 🛡️skjold istedenfor XP (uendret fordeling per rarity, se `rollReward`).
+
+  **Fulle bankbeholdninger gjøres om til XP.** Skjold har tak på 7 dager og
+  hopp-tokens på 5. Tidligere ble overskuddet slukt av `min()` mens
+  avsløringsskjermen fortsatt annonserte hele beløpet — en spiller med full bank
+  fikk ~40 % av kistene til å love et skjold og levere ingenting.
 - **Hopp-token ⚡**: Vunnet fra loot box (uvanlig). Maks 5 banket (`skip_tokens` i profiles). Bruk 1 per runde — hopper over et spørsmål og cacher inn base XP for det spørsmålet (ingen bonusmultiplikator). Hoppet teller **ikke** som riktig svar for perfekt runde eller Crown Win — bruker du hopp mister du sjansen for perfekt-bonus (+25%) og crown win (+50%) den runden. Skaper strategisk valg: er det verdt å bruke hoppet her?
 - **Season reset**: Manuell admin-dato. Micro-admin UI for eier. Nedtelling vises subtilt for spillere. Reset arkiverer league som «Season X»-badge.
 - **Slett konto**: Bruker kan slette alt + koble fra SSO (kan re-registrere med samme konto). Krever Supabase Edge Function (admin API). Sletter alle rader på tvers av alle tabeller.
@@ -99,7 +120,12 @@ Inspired by Fortnite's progression loop and Duolingo's minigame variety.
 - **Streak timezone**: Always use `Europe/Oslo` (handles both UTC+1 winter and UTC+2 summer DST). Never use hardcoded UTC offsets.
 - **Avatar**: DiceBear `adventurer-neutral` SVG (`@dicebear/collection@8` + `@dicebear/core@8` — pin versions, do NOT upgrade without checking API). Faktiske valg: øyne (26), øyenbryn (15), munn (30), briller (5 varianter). Designes ved onboarding, kan endres i profil. Unlockable cosmetics er CSS-lag rundt kortet: kortbakgrunn (per league), ramme/border (Champion+), krone-ikon (crown win), titler (achievements).
 - **Avatar hudfarger**: To grupper i fargevelgeren — **Hudtoner** (5 stk): `#FDDBB4` (lys), `#E8AC80` (medium lys), `#C68642` (medium), `#8D5524` (mørk), `#4A2912` (meget mørk). **Morsomme farger** (8 stk): lilla `#a855f7`, blå `#3b82f6`, grønn `#22c55e`, oransje `#f97316`, rosa `#ec4899`, cyan `#06b6d4`, gul `#eab308`, rød `#ef4444`. Totalt 13 valg, visuelt gruppert i UI.
-- **Oppmuntring ved null riktige**: Viser trist emoji (😢) + tilfeldig valgt norsk oppmuntring, f.eks. «Uffda! Jeg har tro på deg — prøv én gang til! 💪». **25% sjanse** for å aktivere «Comeback-bonus»: neste runde gir +25% XP (merk: IKKE dobling — kun +25%). Presenteres som en dramatisk overraskelse — skjermen lyser opp, konfetti, stor tekst «⚡ EKSTRA SJANSE! ⚡ Neste runde gir BONUS XP — men KUN om du spiller NÅ!». Framer Motion full-screen splash. Bonus lever kun i Zustand (nullstilles ved reload) — forsvinner om de ikke spiller med en gang, noe som forsterker urgency.
+- **Oppmuntring ved dårlig runde**: Viser trist emoji (😢) + tilfeldig valgt norsk oppmuntring, f.eks. «Uffda! Jeg har tro på deg — prøv én gang til! 💪». **25% sjanse** for å aktivere «Comeback-bonus»: neste runde gir +25% XP (merk: IKKE dobling — kun +25%). Presenteres som en dramatisk overraskelse — skjermen lyser opp, konfetti, stor tekst «⚡ EKSTRA SJANSE! ⚡ Neste runde gir BONUS XP — men KUN om du spiller NÅ!». Framer Motion full-screen splash. Bonus lever kun i Zustand (nullstilles ved reload) — forsvinner om de ikke spiller med en gang, noe som forsterker urgency.
+  > ⚠️ **Revidert 2026-09-03.** Trigger var «null riktige», som med realistisk
+  > treffprosent (~85 %) slo til omtrent én gang per 13 000 runder — altså aldri.
+  > Nå: **≤40 % riktige** i runden (`COMEBACK_THRESHOLD` i `src/lib/xp.ts`).
+  > Bonusen finnes for å hekte en unge som nettopp hadde en nedslående økt, så
+  > den må være innen rekkevidde på en genuint dårlig runde.
 - **Backgrounds**: CSS gradients only — no WebP files needed. Each league unlocks a named gradient defined in `src/lib/cosmetics.ts`. Can be upgraded to art assets later without changing logic. The `public/backgrounds/` placeholder folder can be removed.
 - **Viking-maskot**: Gjennomgående karakter (en norsk viking) med snakkeboble brukes til å snakke til spilleren ved nøkkelmoment. Bilder ligger i `public/vikings/`. Navnekonvensjon: `viking-bubble-left-01.webp` (viking ser høyre, boble til venstre) og `viking-bubble-right-01.webp`. Spillet velger random variant per hendelse. Triggere: rundeseier · perfekt runde · Crown Win · null riktige · comeback-bonus · liga-opprykk · strekk-milepæl · onboarding-velkomst · feil svar (mid-runde) · loot box.
 - **Grafikk-kart** (alle steder som trenger illustrasjoner — alle er placeholder webp inntil ekte bilder er laget):
@@ -427,3 +453,44 @@ create policy "achievements_insert_own" on earned_achievements for insert with c
 | Unreal | 11 066 |
 
 Base: 5 XP per riktig svar. Ingen daglig tak.
+
+> ⚠️ **Rebalansering 2026-09-03.** `src/lib/xp.ts` hadde tersklene på **nøyaktig
+> halvparten** av tabellen over (Silver 500, Gold 1 075, … Unreal 5 533) for alle
+> sju trinnene, mens `update_difficulty()` i SQL alltid har brukt tallene over.
+> Klienten er nå rettet opp til å matche. Sammen med flat loot-XP betydde det at
+> spillere klarte Bronse → Gull på omtrent én time, og hele stigen i 3–4 timer.
+>
+> **Endre aldri disse tersklene på ett sted.** De finnes i:
+> `LEAGUE_THRESHOLDS` (`src/lib/xp.ts`) og `update_difficulty()`
+> (`supabase/migrations/003_rebalance.sql`).
+
+### Inntektsmiks etter rebalansering
+
+Simulert over 20 fulle karrierer til Unreal, 85 % treffprosent
+(`rollUpgrade`/`rollReward`-tabellene kopiert direkte fra koden):
+
+| Kilde | Andel av all XP |
+|---|---|
+| Riktige svar | 70,7 % |
+| Bonusmultiplikatorer (perfekt / krone) | 7,8 % |
+| Loot boxes | 21,5 % |
+
+Multiplikatorene er altså den **minste** posten — å kutte dem ville ikke merkbart
+bremset progresjonen, bare gjort gode runder mindre gøy. Driverne var de halverte
+tersklene og flat loot-XP.
+
+### Progresjonstempo (simulert, 85 % treffprosent)
+
+| Liga | Runder | Dager @ 8 runder/dag |
+|---|---|---|
+| Silver | 34 | 4 |
+| Gold | 65 | 8 |
+| Platinum | 96 | 12 |
+| Diamond | 132 | 16 |
+| Elite | 168 | 21 |
+| Champion | 210 | 26 |
+| Unreal | 254 | 32 |
+
+~43,7 XP per runde i snitt. Vil du strekke stigen ytterligere, **doble
+tersklene** — ikke reduser XP per svar: de store tallene som spretter opp på
+skjermen er hele belønningsmekanismen.

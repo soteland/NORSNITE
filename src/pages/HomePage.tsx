@@ -21,7 +21,7 @@ export default function HomePage() {
   }, [user, navigate])
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-[100dvh] flex items-center justify-center">
       <p className="text-[var(--muted)] animate-pulse">Laster…</p>
     </div>
   )

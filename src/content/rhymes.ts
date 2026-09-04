@@ -43,6 +43,27 @@ export const rhymeQuestions: RhymeQuestion[] = [
   { type: 'rhyme', id: 'rhy-033', difficulty: 7, word: 'minne',    correct: 'finne',    choices: ['finne',    'glemme', 'miste',   'savne'] },
   { type: 'rhyme', id: 'rhy-034', difficulty: 7, word: 'stille',   correct: 'grille',   choices: ['grille',   'bråk',   'lyd',     'rop'] },
   { type: 'rhyme', id: 'rhy-035', difficulty: 7, word: 'glede',    correct: 'rede',     choices: ['rede',     'sorg',   'sinne',   'frykt'] },
+  // D8 — the pool used to stop at D7, which made 'rhyme' return null for every
+  // round at difficulty 9-10 (getRhymeForDifficulty matches ±1). buildRound then
+  // burned attempts on a type that could never resolve and could silently return
+  // a short round.
+  { type: 'rhyme', id: 'rhy-036', difficulty: 8, word: 'bestemme',  correct: 'hjemme',      choices: ['hjemme',      'borte',    'ute',      'inne'] },
+  { type: 'rhyme', id: 'rhy-037', difficulty: 8, word: 'forklare',  correct: 'bevare',      choices: ['bevare',      'forstå',   'spørre',   'lure'] },
+  { type: 'rhyme', id: 'rhy-038', difficulty: 8, word: 'begynne',   correct: 'skynne',      choices: ['skynne',      'slutte',   'ende',     'stoppe'] },
+  { type: 'rhyme', id: 'rhy-039', difficulty: 8, word: 'oppdage',   correct: 'plage',       choices: ['plage',       'finne',    'miste',    'gjemme'] },
+  { type: 'rhyme', id: 'rhy-040', difficulty: 8, word: 'forsvinne', correct: 'vinne',       choices: ['vinne',       'komme',    'vise',     'bli'] },
+  // D9
+  { type: 'rhyme', id: 'rhy-041', difficulty: 9, word: 'erfaring',   correct: 'forklaring', choices: ['forklaring',  'kunnskap', 'visdom',   'evne'] },
+  { type: 'rhyme', id: 'rhy-042', difficulty: 9, word: 'rettferdig', correct: 'verdig',     choices: ['verdig',      'ærlig',    'riktig',   'sann'] },
+  { type: 'rhyme', id: 'rhy-043', difficulty: 9, word: 'forsiktig',  correct: 'viktig',     choices: ['viktig',      'nøye',     'trygg',    'rolig'] },
+  { type: 'rhyme', id: 'rhy-044', difficulty: 9, word: 'spennende',  correct: 'brennende',  choices: ['brennende',   'kjedelig', 'rolig',    'trist'] },
+  { type: 'rhyme', id: 'rhy-045', difficulty: 9, word: 'behandle',   correct: 'forvandle',  choices: ['forvandle',   'ordne',    'styre',    'hjelpe'] },
+  // D10
+  { type: 'rhyme', id: 'rhy-046', difficulty: 10, word: 'ansvarlig',    correct: 'forsvarlig', choices: ['forsvarlig', 'pliktig',  'streng',    'nøye'] },
+  { type: 'rhyme', id: 'rhy-047', difficulty: 10, word: 'nødvendig',    correct: 'innvendig',  choices: ['innvendig',  'viktig',   'unyttig',   'mulig'] },
+  { type: 'rhyme', id: 'rhy-048', difficulty: 10, word: 'virkelighet',  correct: 'mulighet',   choices: ['mulighet',   'drøm',     'tanke',     'ønske'] },
+  { type: 'rhyme', id: 'rhy-049', difficulty: 10, word: 'forbedring',   correct: 'endring',    choices: ['endring',    'stans',    'tap',       'feil'] },
+  { type: 'rhyme', id: 'rhy-050', difficulty: 10, word: 'forundring',   correct: 'undring',    choices: ['undring',    'klarhet',  'visshet',   'sikkerhet'] },
 ]
 
 export function getRhymeForDifficulty(difficulty: number): RhymeQuestion[] {

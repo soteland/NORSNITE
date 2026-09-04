@@ -46,7 +46,7 @@ export default function WordOrder({ question, onAnswer, disabled }: Props) {
 
     return (
         <div className="flex flex-col items-center gap-5 w-full">
-            <p className="text-2xl font-bold tracking-wide text-[var(--muted)]">
+            <p className="text-xl font-bold tracking-wide text-[var(--muted)]">
                 Sett ordene i riktig rekkefølge
             </p>
 
@@ -61,7 +61,7 @@ export default function WordOrder({ question, onAnswer, disabled }: Props) {
                         key={`${tile}-${idx}`}
                         disabled={disabled}
                         onClick={() => removeTile(tile, idx)}
-                        className="px-3 py-1.5 rounded-xl bg-purple-600/80 border border-purple-400/60
+                        className="px-3.5 py-2 min-h-12 rounded-xl bg-purple-600/80 border border-purple-400/60
                        text-white font-semibold text-lg
                        hover:bg-purple-500/80 active:scale-95 transition-all"
                     >
@@ -77,7 +77,7 @@ export default function WordOrder({ question, onAnswer, disabled }: Props) {
                         key={`${tile}-${idx}`}
                         disabled={disabled}
                         onClick={() => placeTile(tile, idx)}
-                        className="px-3 py-1.5 rounded-xl bg-white/10 border-2 border-white/20
+                        className="px-3.5 py-2 min-h-12 rounded-xl bg-white/10 border-2 border-white/20
                        text-white font-semibold text-lg
                        hover:bg-white/20 active:scale-95 transition-all"
                     >

@@ -329,8 +329,12 @@ export default function OnboardingPage() {
   )
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'radial-gradient(ellipse at top, #1a0a2e 0%, #0a0a0f 60%)' }}>
+    <div className="min-h-[100dvh] flex items-center justify-center p-4"
+      style={{
+        background: 'radial-gradient(ellipse at top, #1a0a2e 0%, #0a0a0f 60%)',
+        paddingTop: 'max(env(safe-area-inset-top), 16px)',
+        paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
+      }}>
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-6">

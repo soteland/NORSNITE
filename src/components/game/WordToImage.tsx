@@ -14,13 +14,17 @@ export default function WordToImage({ question, onAnswer, disabled }: Props) {
     return (
         <div className="flex flex-col items-center gap-6 w-full">
             <div className="text-center">
-                <p className="text-3xl font-bold tracking-wide text-[var(--muted)] mb-2">
+                <p className="text-xl font-bold tracking-wide text-[var(--muted)] mb-2">
                     Hvilket bilde passer til ordet?
                 </p>
                 <h2 className="text-4xl font-black text-white">{question.word.word}</h2>
             </div>
 
-            <div className={`grid gap-4 w-full max-w-sm ${question.choices.length === 4 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+            {/* max-w-[320px] rather than max-w-sm (384px): at 4 choices the
+                aspect-square cells were 184px, so two rows came to 384px and
+                pushed the grid off a 390x844 screen. 152px cells are still an
+                enormous tap target for a 60px emoji. */}
+            <div className={`grid gap-4 w-full max-w-[320px] ${question.choices.length === 4 ? 'grid-cols-2' : 'grid-cols-3'}`}>
                 {question.choices.map((choice) => (
                     <button
                         key={choice.id}
