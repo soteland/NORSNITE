@@ -25,6 +25,13 @@ function hasTeachingNote(q: Question): q is PunctuationQuestion | DoubleConsonan
 }
 type AnswerStatus = 'idle' | 'correct' | 'wrong' | 'showing_correct' | 'finishing'
 
+// Wrong-answer pause, split in two: red flash only, then the correct answer is
+// revealed. The countdown bar in the feedback banner drains over the sum, so
+// these are the single source for both the timeouts and the bar duration.
+const WRONG_FLASH_MS = 1000
+const WRONG_REVEAL_MS = 2500
+const WRONG_TOTAL_MS = WRONG_FLASH_MS + WRONG_REVEAL_MS
+
 export default function GamePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -168,7 +175,7 @@ export default function GamePage() {
     const showLoot = import.meta.env.DEV ? Math.random() < 0.5 : normalTrigger
 
     setPhase(showLoot ? 'loot' : 'result')
-  }, [user, profileBefore, originalCount, clearComeback, activateComeback])
+  }, [user, profileBefore, originalCount, clearComeback, activateComeback, checkAndGrant])
 
   const xpResultRef = useRef<ReturnType<typeof calculateXp> | null>(null)
 
@@ -219,8 +226,8 @@ export default function GamePage() {
           setTeachingNote(null)
           setHintVisible(false)
           advanceQueue(qIndex + 1, newQueue, correctCount, usedSkip, crownActive, fastCount)
-        }, 2500)
-      }, 1000)
+        }, WRONG_REVEAL_MS)
+      }, WRONG_FLASH_MS)
     }
   }
 
@@ -417,7 +424,7 @@ export default function GamePage() {
           </div>
         )}
         {(answerStatus === 'wrong' || answerStatus === 'showing_correct') && (
-          <div className="rounded-2xl bg-red-500/20 border-2 border-red-400/50 py-3 px-4 text-center">
+          <div className="relative overflow-hidden rounded-2xl bg-red-500/20 border-2 border-red-400/50 py-3 px-4 text-center">
             <p className="text-red-300 font-black text-2xl">✗ Feil!</p>
             {/* Reserved row for correct-answer reveal — always present to hold height */}
             <div className="min-h-[28px] mt-1">
@@ -427,6 +434,13 @@ export default function GamePage() {
                 </p>
               )}
             </div>
+            {/* Countdown to the next question. Absolutely placed so it costs no
+                height, and mounted for both wrong-states so the animation runs
+                once across the whole pause instead of restarting halfway. */}
+            <div
+              className="drain absolute bottom-0 left-0 right-0 h-1.5 bg-red-300/70"
+              style={{ animationDuration: `${WRONG_TOTAL_MS}ms` }}
+            />
           </div>
         )}
       </div>
@@ -434,11 +448,15 @@ export default function GamePage() {
       {/* Question — scrolls rather than clipping if a long word or a 4-choice
           grid still exceeds the space (iPhone 12 leaves ~470px here). */}
       <div className="flex-1 flex items-center justify-center px-4 pt-4 pb-2 overflow-y-auto">
-        <QuestionCard
-          question={currentQuestion}
-          onAnswer={handleAnswer}
-          disabled={answerStatus !== 'idle'}
-        />
+        {/* Keyed on qIndex so the zoom+fade replays for every new task (and for
+            a re-queued retry, which also re-triggers the read-aloud effects). */}
+        <div key={qIndex} className="question-in w-full flex items-center justify-center">
+          <QuestionCard
+            question={currentQuestion}
+            onAnswer={handleAnswer}
+            disabled={answerStatus !== 'idle'}
+          />
+        </div>
       </div>
 
       {/* Teaching note — BELOW quiz, delayed reveal. Only 'punctuation' and

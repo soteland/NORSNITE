@@ -1,6 +1,6 @@
 // Hook: fetch earned achievements + check for new ones after round end
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/client'
 import { checkNewAchievements, type ProfileStats } from '@/lib/achievements'
@@ -11,19 +11,34 @@ export function useAchievements(userId: string | undefined) {
   const [earnedKeys, setEarnedKeys] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
 
+  // checkAndGrant is captured by GamePage's endRound callback, which does not
+  // list it as a dependency. If the callback read earnedKeys from state it
+  // would keep a closure over the empty initial Set and report every owned
+  // achievement as new. Reading through a ref keeps checkAndGrant stable and
+  // always current.
+  const earnedRef = useRef<Set<string>>(new Set())
+  // The in-flight initial fetch, so a round ending before it lands waits for
+  // it instead of diffing against nothing.
+  const loadRef = useRef<Promise<void> | null>(null)
+
   // Fetch earned achievements on mount
   useEffect(() => {
     if (!userId) return
-    supabase
-      .from('earned_achievements')
-      .select('achievement_key')
-      .eq('user_id', userId)
-      .then(({ data }) => {
-        if (data) {
-          setEarnedKeys(new Set(data.map(r => r.achievement_key)))
-        }
-        setLoading(false)
-      })
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('earned_achievements')
+        .select('achievement_key')
+        .eq('user_id', userId)
+      if (error) {
+        console.error('Kunne ikke hente merker:', error)
+      } else if (data) {
+        const keys = new Set(data.map(r => r.achievement_key))
+        earnedRef.current = keys
+        setEarnedKeys(keys)
+      }
+      setLoading(false)
+    }
+    loadRef.current = load()
   }, [userId])
 
   // Check + grant new achievements after a round completes
@@ -80,26 +95,31 @@ export function useAchievements(userId: string | undefined) {
       friendCount: friendCount ?? 0,
     }
 
-    const newKeys = checkNewAchievements(stats, earnedKeys)
+    const newKeys = checkNewAchievements(stats, earnedRef.current)
 
     if (newKeys.length > 0) {
-      // Insert new achievements into DB
-      const rows = newKeys.map(key => ({
-        user_id: userId,
-        achievement_key: key,
-      }))
-      await supabase.from('earned_achievements').insert(rows)
+      // upsert + ignoreDuplicates, not insert: a single already-owned key used
+      // to make the whole batch fail on the (user_id, achievement_key) primary
+      // key, so nothing was saved and every badge popped again next session.
+      const { error } = await supabase.from('earned_achievements').upsert(
+        newKeys.map(key => ({ user_id: userId, achievement_key: key })),
+        { onConflict: 'user_id,achievement_key', ignoreDuplicates: true },
+      )
+      if (error) {
+        // Never announce a badge we failed to record — it would pop again on
+        // the next round. It stays pending and is granted next time.
+        console.error('Kunne ikke lagre merker:', error)
+        return []
+      }
 
-      // Update local state
-      setEarnedKeys(prev => {
-        const next = new Set(prev)
-        newKeys.forEach(k => next.add(k))
-        return next
-      })
+      const next = new Set(earnedRef.current)
+      newKeys.forEach(k => next.add(k))
+      earnedRef.current = next
+      setEarnedKeys(next)
     }
 
     return newKeys
-  }, [userId, earnedKeys])
+  }, [userId])
 
   return { earnedKeys, loading, checkAndGrant }
 }

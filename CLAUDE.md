@@ -45,7 +45,7 @@ Trust boundary: XP amounts and loot rolls are computed client-side and written b
 
 `src/lib/xp.ts` is the single source for leagues: `LEAGUES` (Bronze → Unreal), `LEAGUE_THRESHOLDS` (cumulative XP), `LEAGUE_DIFFICULTY_FLOOR`, `ROUND_LENGTH`. `roundController.ts` owns `UNLOCK_AT`, which maps each league to the question types it unlocks — this is what gates minigames behind progression.
 
-Difficulty (1–10, new players start at 2) changes **only** via player self-report (`DifficultyCheck.tsx`, triggered when `total_correct_answers` crosses a multiple of 15) and the league floor. There is no auto-adjustment from performance; don't add one without checking `PLAN.md`.
+Difficulty (1–10, new players start at 2) changes **only** via player self-report (`DifficultyCheck.tsx`, triggered when `total_correct_answers` crosses a multiple of 30) and the league floor. There is no auto-adjustment from performance; don't add one without checking `PLAN.md`.
 
 ⚠️ **Known divergence:** the league XP thresholds in `src/lib/xp.ts` (Silver 500, Gold 1075, …) do **not** match the thresholds hardcoded in the `update_difficulty()` SQL function or `PLAN.md` (Silver 1000, Gold 2150, …). The client decides which league to display and which minigames to unlock; the server decides the difficulty floor. Changing thresholds means editing both places.
 

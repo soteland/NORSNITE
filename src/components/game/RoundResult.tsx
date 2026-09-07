@@ -20,9 +20,13 @@ interface Props {
   onPlayAgain: () => void
 }
 
-/** Returns true if total_correct_answers crossed a multiple of 15 this round */
+/** How many correct answers between difficulty self-checks. Deliberately coarse
+ *  — being asked too often makes the question feel like nagging. */
+const DIFFICULTY_CHECK_EVERY = 30
+
+/** Returns true if total_correct_answers crossed a multiple of DIFFICULTY_CHECK_EVERY this round */
 function crossedDifficultyThreshold(before: number, after: number): boolean {
-  return Math.floor(after / 15) > Math.floor(before / 15)
+  return Math.floor(after / DIFFICULTY_CHECK_EVERY) > Math.floor(before / DIFFICULTY_CHECK_EVERY)
 }
 
 const stagger = {

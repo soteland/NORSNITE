@@ -43,6 +43,32 @@
 
 .shake { animation: shake 0.45s ease-in-out; }
 
+/* Wrong-answer countdown. The bar drains over the whole feedback pause so the
+   kid can see when the next question lands — without it they tap into it. */
+@keyframes drain {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+.drain {
+  transform-origin: left center;
+  animation-name: drain;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  /* duration is set inline from the same constants that drive the timeouts */
+}
+
+/* New question enter — a short zoom+fade so a new task never just swaps in
+   under a finger that's already moving. */
+@keyframes question-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.question-in { animation: question-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .question-in { animation: none; }
+}
+
 @layer components {
   .btn-primary {
     display: flex;

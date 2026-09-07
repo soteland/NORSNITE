@@ -64,11 +64,43 @@ export function shuffleArray<T>(arr: T[]): T[] {
   return a
 }
 
+/**
+ * Pick `count` distractors for a picture question, same category as the target.
+ *
+ * Distinct ids are not enough: the word pool reuses an emoji across several
+ * entries in one category (🎻 is fiolin, cello AND kontrabass; 🧥 is four
+ * different jackets), and a handful of words appear twice. Drawing on id alone
+ * could show the same 🎻 tile twice in word_to_image, or offer both "fiolin"
+ * and "cello" under one 🎻 in image_to_word — a question with two right answers
+ * that a kid can only lose. So dedupe on emoji AND word, target included.
+ *
+ * Falls back to other categories if the category runs dry after deduping, so
+ * the choice count never silently shrinks.
+ */
+function pickDistractors(target: Word, count: number): Word[] {
+  const usedEmoji = new Set([target.emoji])
+  const usedWord = new Set([target.word])
+  const picked: Word[] = []
+
+  const take = (pool: Word[]) => {
+    for (const w of shuffleArray(pool)) {
+      if (picked.length >= count) return
+      if (w.id === target.id || usedEmoji.has(w.emoji) || usedWord.has(w.word)) continue
+      usedEmoji.add(w.emoji)
+      usedWord.add(w.word)
+      picked.push(w)
+    }
+  }
+
+  take(words.filter(w => w.category === target.category))
+  if (picked.length < count) take(words.filter(w => w.category !== target.category))
+  return picked
+}
+
 // Build a word_to_image question for a given word
 export function buildWordToImage(target: Word, difficulty: number): WordToImageQuestion {
-  const pool = words.filter(w => w.category === target.category && w.id !== target.id)
   const choiceCount = difficulty <= 4 ? 2 : 3 // 3 or 4 total choices
-  const wrong = shuffleArray(pool).slice(0, choiceCount)
+  const wrong = pickDistractors(target, choiceCount)
   return {
     type: 'word_to_image',
     id: `wti-${target.id}`,
@@ -80,9 +112,8 @@ export function buildWordToImage(target: Word, difficulty: number): WordToImageQ
 
 // Build an image_to_word question for a given word
 export function buildImageToWord(target: Word, difficulty: number): ImageToWordQuestion {
-  const pool = words.filter(w => w.category === target.category && w.id !== target.id)
   const choiceCount = difficulty <= 4 ? 2 : 3
-  const wrong = shuffleArray(pool).slice(0, choiceCount)
+  const wrong = pickDistractors(target, choiceCount)
   return {
     type: 'image_to_word',
     id: `itw-${target.id}`,

@@ -86,7 +86,7 @@ export const LEAGUE_ACHIEVEMENTS: Achievement[] = [
   { key: 'league_silver',   emoji: '🥈', name: 'Sølv',      description: 'Nå Silver league',   rarity: 'common' },
   { key: 'league_gold',     emoji: '🥇', name: 'Gull',      description: 'Nå Gold league',     rarity: 'uncommon' },
   { key: 'league_platinum', emoji: '💜', name: 'Platina',    description: 'Nå Platinum league', rarity: 'uncommon' },
-  { key: 'league_diamond',  emoji: '💙', name: 'Diamant',    description: 'Nå Diamond league',  rarity: 'rare' },
+  { key: 'league_diamond_t', emoji: '💙', name: 'Diamant',    description: 'Nå Diamond league',  rarity: 'rare' },
   { key: 'league_elite',    emoji: '🔥', name: 'Elite',      description: 'Nå Elite league',    rarity: 'epic' },
   { key: 'league_champion', emoji: '👑', name: 'Champion',   description: 'Nå Champion league', rarity: 'epic' },
   { key: 'league_unreal_t', emoji: '⚡', name: 'Unreal',     description: 'Nå Unreal league',   rarity: 'legendary' },
@@ -122,8 +122,12 @@ export function checkNewAchievements(
 ): string[] {
   const newKeys: string[] = []
 
+  // Guards BOTH ways: not already owned, and not already queued this call.
+  // Without the second check a key granted twice here (the league loop plus a
+  // milestone line below) produced two identical rows in one insert, which the
+  // earned_achievements primary key rejected — killing the whole batch.
   function grant(key: string) {
-    if (!earnedKeys.has(key)) newKeys.push(key)
+    if (!earnedKeys.has(key) && !newKeys.includes(key)) newKeys.push(key)
   }
 
   // Milestone achievements
@@ -154,7 +158,7 @@ export function checkNewAchievements(
   const leagueIdx = LEAGUE_ORDER.indexOf(league)
   const leagueKeys = [
     'league_bronze', 'league_silver', 'league_gold', 'league_platinum',
-    'league_diamond', 'league_elite', 'league_champion', 'league_unreal_t',
+    'league_diamond_t', 'league_elite', 'league_champion', 'league_unreal_t',
   ]
   for (let i = 0; i <= leagueIdx; i++) {
     grant(leagueKeys[i])

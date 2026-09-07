@@ -31,7 +31,7 @@ export const LEAGUE_THRESHOLDS: Record<League, number> = {
 
 // Minimum difficulty level enforced at each league.
 // Deliberately shallow: difficulty is driven by the player's own self-report
-// (DifficultyCheck, every 15 correct answers), and these floors exist only as a
+// (DifficultyCheck, every 30 correct answers), and these floors exist only as a
 // safety net so a player who always answers "for lett" can't sit at level 1
 // forever. Do NOT raise these to track leagues 1:1 — that gates difficulty
 // behind XP grinding rather than demonstrated ability.
